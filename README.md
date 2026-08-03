@@ -3,6 +3,7 @@ https://www.tabnews.com.br/kenimo49/confiei-no-claude-code-no-piloto-automatico-
 https://github.com/akitaonrails/ai-jail
 https://github.com/21st-dev/magic-mcp
 https://github.com/Jpisnice/shadcn-ui-mcp-server
+https://github.com/ruvnet/ruflo
 
 FRONT
 
