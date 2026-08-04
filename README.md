@@ -13,6 +13,9 @@ Servidores que implementam o protocolo MCP para expandir as capacidades de assis
 * ### [ChromeDevTools/chrome-devtools-mcp](https://github.com/ChromeDevTools/chrome-devtools-mcp)
   * **Descrição:** Servidor MCP oficial desenvolvido pela equipe do Chrome DevTools. Permite que assistentes de IA se conectem ao navegador para inspecionar o DOM, analisar a rede, auditar acessibilidade e depurar a aplicação em tempo real.
 
+* ### [Graphify-Labs/graphify](https://github.com/Graphify-Labs/graphify)
+  * **Descrição:** Servidor MCP que transforma bases de dados, arquivos e dados não estruturados em grafos de conhecimento (*Knowledge Graphs*). Melhora significativamente a recuperação de contexto (RAG) para agentes de IA, permitindo mapear relações complexas entre informações.
+
 ---
 
 ## 🎨 Skills para IA (Prompt & Design Guidelines)
@@ -36,15 +39,23 @@ Habilidades e pacotes de instruções projetados para calibrar e aprimorar o com
 * ### [anthropics/skills (frontend-design)](https://github.com/anthropics/skills/blob/main/skills/frontend-design/SKILL.md)
   * **Descrição:** Skill oficial da Anthropic para design de frontend. Orienta o Claude a criar interfaces web elegantes, utilizáveis, modernas e responsivas, superando padrões clichês gerados por IA.
 
+### 🧠 Skills de Conhecimento, Pesquisa & Engenharia de Prompts
+
+* ### [PleasePrompto/notebooklm-skill](https://github.com/PleasePrompto/notebooklm-skill)
+  * **Descrição:** Skill focada em emular a metodologia do NotebookLM da Google. Orienta o modelo de IA a atuar como um especialista em síntese, curadoria e análise profunda de documentos, organizando fontes e gerando resumos estruturados de alto valor factual.
+
 ---
 
-## 🛠️ Outros (Segurança, Sandbox, Frameworks & Otimizações)
+## 🛠️ Outros (Segurança, Sandbox, Roteamento & Otimizações)
 
 * ### [Artigo TabNews: Confiei no Claude Code no piloto automático...](https://www.tabnews.com.br/kenimo49/confiei-no-claude-code-no-piloto-automatico-e-o-shai-hulud-quase-entrou-5-permissoes-que-reduzi-hoje)
   * **Descrição:** Artigo por Ken Imoto relatando riscos de segurança ao usar o Claude Code no modo *Auto* (piloto automático) contra ataques de *prompt-injection* e pacotes npm maliciosos (como o worm Shai-Hulud). Apresenta 5 regras práticas de permissão no `settings.json` para proteger credenciais e o sistema local.
 
 * ### [akitaonrails/ai-jail](https://github.com/akitaonrails/ai-jail)
   * **Descrição:** Desenvolvido por Fabio Akita, é um wrapper de segurança/sandbox multi-OS (usando `bubblewrap` no Linux e `sandbox-exec` no macOS). Restringe o acesso do Claude Code e outros agentes de IA apenas às pastas do projeto, isolando arquivos sensíveis como `~/.ssh` e `.env`.
+
+* ### [diegosouzapw/OmniRoute](https://github.com/diegosouzapw/OmniRoute)
+  * **Descrição:** Roteador inteligente de requisições LLM. Permite gerenciar múltiplos provedores e modelos de IA (OpenAI, Anthropic, Gemini, Ollama, etc.), aplicando estratégias de fallback, balanceamento de carga, monitoramento de custos e controle de latência.
 
 * ### [ruvnet/ruflo](https://github.com/ruvnet/ruflo)
   * **Descrição:** Framework open-source para orquestração de múltiplos agentes de IA (*swarm intelligence* e *agentic workflows*). Permite criar fluxos de trabalho colaborativos e distribuídos entre assistentes de IA.
