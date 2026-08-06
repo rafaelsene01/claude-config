@@ -6,7 +6,9 @@
 
 **When to trigger (auto-detect):** The spec contains user-facing behavior that could go multiple ways AND the user hasn't expressed a preference. If the spec is clear and unambiguous, skip this entirely.
 
-**When NOT to trigger:** Genuinely trivial features — a pure read endpoint, a config tweak, features with no [implicit-requirement dimensions](specify.md#implicit-requirement-dimensions) present (no persistence/state, external calls, auth, payments, concurrency, or state transitions). When any dimension is present, trigger discuss.
+**When NOT to trigger:** Infrastructure work, CRUD operations, well-defined API contracts, anything where the "how" is obvious from the "what" — or anything already settled during [Exploration](exploration.md).
+
+**Not the same as Exploration.** Exploration runs BEFORE the spec exists and establishes WHAT the demand is. Discuss runs after, against a written spec, and settles HOW an already-scoped behavior should look. If the frontier from Exploration was properly emptied, most features will not need Discuss at all.
 
 ## Why This Phase Exists
 
@@ -21,7 +23,7 @@ The output — `context.md` — feeds directly into Design and Tasks:
 
 ### 1. Analyze the Feature
 
-Read `.specs/features/[feature]/spec.md` and identify the domain:
+Read `.specs/features/[feature]/spec/INDEX.md` and the spec slice(s) in question, then identify the domain:
 
 | Domain                         | Gray areas to explore                                         |
 | ------------------------------ | ------------------------------------------------------------- |
@@ -30,15 +32,12 @@ Read `.specs/features/[feature]/spec.md` and identify the domain:
 | Something users **RUN** (CLI)  | Output format, flags, modes, error handling, verbosity        |
 | Something users **READ**       | Structure, tone, depth, flow, navigation                      |
 | Something being **ORGANIZED**  | Grouping criteria, naming, duplicates, exceptions             |
-| Something with **backend / state / contract** | Failure & partial-failure states, idempotency/retry/dedup, auth boundaries & rate limits, data lifecycle/expiry, concurrency/ordering — see [implicit-requirement dimensions](specify.md#implicit-requirement-dimensions) |
 
 Generate 3-4 **feature-specific** gray areas. Not generic categories, but concrete decisions for THIS feature.
 
 ### 2. Present Gray Areas
 
-Present the feature boundary (from spec.md) and the gray areas to the user. Let them choose which to discuss. Do NOT include a "skip all" option — the user invoked this phase to discuss.
-
-Any gray area the user **declines** to discuss, or that goes undiscussed, is written to the spec's **Assumptions & Open Questions** section (agent's chosen default + rationale) — never silently dropped. This ensures the spec's closure gate can pass: every gray area is either resolved through discussion or recorded as a signed-off assumption.
+Present the feature boundary (from `spec/INDEX.md`) and the gray areas to the user. Let them choose which to discuss. Do NOT include a "skip all" option — the user invoked this phase to discuss.
 
 ### 3. Deep-Dive Each Area
 
@@ -57,7 +56,7 @@ For each selected area:
 
 ### 4. Scope Guardrail (CRITICAL)
 
-The feature boundary from spec.md is **fixed**. Discussion clarifies HOW to implement, never WHETHER to add new capabilities.
+The feature boundary from `spec/INDEX.md` is **fixed**. Discussion clarifies HOW to implement, never WHETHER to add new capabilities.
 
 **Allowed:** "How should posts be displayed?" (clarifying ambiguity)
 **Not allowed:** "Should we also add comments?" (new capability)
@@ -74,14 +73,14 @@ When user suggests scope creep: "That sounds like a separate feature. I'll note 
 # [Feature] Context
 
 **Gathered:** [date]
-**Spec:** `.specs/features/[feature]/spec.md`
+**Specs:** `.specs/features/[feature]/spec/`
 **Status:** Ready for design
 
 ---
 
 ## Feature Boundary
 
-[Clear statement of what this feature delivers — the scope anchor from spec.md]
+[Clear statement of what this feature delivers — the scope anchor from `spec/INDEX.md`]
 
 ---
 
@@ -103,10 +102,6 @@ When user suggests scope creep: "That sounds like a separate feature. I'll note 
 ### Agent's Discretion
 
 [Areas where user explicitly said "you decide" — agent has flexibility here during design/implementation]
-
-### Declined / Undiscussed Gray Areas → Assumptions
-
-[Gray areas the user declined to discuss or that were not covered. Each entry is written to the spec's Assumptions & Open Questions section with the agent's chosen default and rationale — not left silently unresolved.]
 
 ---
 

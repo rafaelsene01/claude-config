@@ -8,16 +8,7 @@
 
 ### 1. Load Context
 
-Read `.specs/features/[feature]/spec.md` before designing. If `.specs/features/[feature]/context.md` exists, load it too — it contains implementation decisions that constrain the design (layout choices, behavior preferences, interaction patterns). Decisions marked as "Agent's Discretion" are yours to decide.
-
-**Mandatory: read `.specs/STATE.md` `## Decisions` now.** This MUST happen before any architectural choices are made. Every `active` `AD-NNN` entry is a project-level constraint this design must conform to. If a decision from a prior feature conflicts with what is best for this feature, you have two options — both require an explicit choice:
-
-1. **Conform** — Design within the active constraint.
-2. **Supersede** — Append a new `AD-NNN` entry to `.specs/STATE.md` `## Decisions` that supersedes the old one (set the old entry's `status` to `superseded by AD-NNN`) and document the reason. The new decision becomes the project standard going forward.
-
-Silently ignoring an active decision is not an option — it creates invisible inconsistency across features.
-
-**Also load confirmed lessons** relevant to this feature: `python3 scripts/lessons.py list --status confirmed` (filter with `--scope`/`--query`). These are past verification failures distilled into guidance — apply them while designing. Load only `confirmed`. Skip silently if no store or no code tool. See [lessons.md](lessons.md).
+Read `.specs/features/[feature]/spec/INDEX.md` first, then each `spec/NN-*.md` one at a time before designing. If `.specs/features/[feature]/context.md` exists, load it too — it contains implementation decisions that constrain the design (layout choices, behavior preferences, interaction patterns). Decisions marked as "Agent's Discretion" are yours to decide.
 
 ### 1.5. Research (Optional but Recommended)
 
@@ -33,27 +24,15 @@ Codebase → Project docs → Context7 MCP → Web search → Flag as uncertain
 
 Good triggers for research: new libraries, unfamiliar APIs, performance-sensitive features, security-sensitive features, patterns you haven't used in this codebase before.
 
-**Concern flagging (MUST do while reading code):** While walking the codebase via the Knowledge Verification Chain, flag any concerns you encounter in the areas this feature touches. Capture each finding in the `## Risks & Concerns` section of `design.md`:
-
-- **Fragile code** — tight coupling, large functions, implicit state
-- **Tech debt** — hacks, workarounds, deprecated APIs
-- **Security risks** — unvalidated input, auth gaps, exposed secrets
-- **Performance bottlenecks** — N+1 queries, unbounded loops, missing indexes
-- **Test coverage gaps** — untested paths the feature depends on
-
-Every flagged concern MUST include a mitigation — how the design (or a follow-up task) addresses it.
-
 ### 2. Define Architecture
 
-**Large/Complex only — approach exploration:** Before committing to a single architecture, present 2–3 viable approaches with trade-offs and a recommendation. Lead with the recommendation to avoid analysis paralysis. All approaches must deliver the same scoped thing (no alternative scopes). Confirm the chosen approach with the user before detailing components. Medium features: skip — design inline.
-
-Overview of how components interact. Use mermaid diagrams when helpful.
+Overview of how components interact. Use mermaid diagrams when helpful. Before creating any diagrams, check if the `mermaid-studio` skill is available (see Skill Integrations in SKILL.md).
 
 ### 3. Identify Code Reuse
 
 **CRITICAL**: What existing code can we leverage? This saves tokens and reduces errors.
 
-Flag any concerns found here per step 1.5 into `## Risks & Concerns`.
+If `.specs/codebase/CONCERNS.md` exists, check it before designing. Any component flagged as fragile, carrying tech debt, or having test coverage gaps requires extra care in the design — document how the design mitigates those concerns.
 
 ### 4. Define Components and Interfaces
 
@@ -65,12 +44,12 @@ If the feature involves data, define models before implementation.
 
 ---
 
-## Template: `.specs/features/[feature]/design.md`
+## Template: `.specs/[feature]/design.md`
 
 ````markdown
 # [Feature] Design
 
-**Spec**: `.specs/features/[feature]/spec.md`
+**Specs**: `.specs/features/[feature]/spec/` (see `INDEX.md` for the spec map)
 **Status**: Draft | Approved
 
 ---
@@ -167,23 +146,11 @@ interface AnotherModel {
 
 ---
 
-## Risks & Concerns
-
-| Concern | Location (file:line) | Impact | Mitigation |
-| ------- | -------------------- | ------ | ---------- |
-| [Fragile code / tech debt / security / perf / test gap] | `src/path/file.ts:42` | [What breaks or degrades] | [How the design or a follow-up task addresses it] |
-
-> None found — is a valid entry.
-
----
-
 ## Tech Decisions (only non-obvious ones)
 
 | Decision          | Choice          | Rationale     |
 | ----------------- | --------------- | ------------- |
 | [What we decided] | [What we chose] | [Why - brief] |
-
-> **Project-level decisions:** If a decision here sets a convention, pattern, or constraint that future features must follow, append it to `.specs/STATE.md` `## Decisions` as the next `AD-NNN` entry (see [memory.md](memory.md)). Feature-local decisions stay only in this table.
 
 ---
 
@@ -193,7 +160,7 @@ interface AnotherModel {
 - **Research when uncertain** — 5 minutes of research prevents hours of rework
 - **Reuse is king** — Every component should reference existing patterns
 - **Interfaces first** — Define contracts before implementation
-- **Keep it visual** — Diagrams save 1000 words
+- **Keep it visual** — Diagrams save 1000 words (check mermaid-studio skill in Skill Integrations)
 - **Small components** — If component does 3+ things, split it
-- **Flag concerns inline** — Risks found during research go in Risks & Concerns with a mitigation
+- **Check CONCERNS.md** — If it exists, flag fragile areas the design must address
 - **Confirm before Tasks** — User approves design before breaking into tasks
