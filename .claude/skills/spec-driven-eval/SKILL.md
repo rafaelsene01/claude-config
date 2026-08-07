@@ -5,7 +5,7 @@ license: CC-BY-4.0
 disable-model-invocation: true
 metadata:
   author: Waldemar Neto - github.com/waldemarnt
-  version: '1.0.0'
+  version: '1.1.0'
 ---
 
 # Spec-Driven Implementation Evaluation
@@ -35,7 +35,18 @@ Scoring is **checklist-based**: every criterion is decomposed into atomic binary
 1. **The PRD** (ground-truth product intent) — the user story acceptance criteria are the unit of evaluation.
 2. **The implementation** (production code).
 3. **The tests** (unit + e2e).
-4. **The SDD-derived artifacts** — `spec.md` and `tasks.md` (refined ACs, requirement IDs, derived requirements). Required for the Elicitation `E` and Scope `S` axes (they grade *these* against the PRD). When absent, `Final`/`T` still run, but report `E`/`S` as `n/a — no derived spec`. The **PRD remains the source of truth** for what counts as "expected"; the derived spec is what gets graded for respect and extraction.
+4. **The SDD-derived artifacts** — whatever spec + task files the framework produced (refined ACs, requirement IDs, derived requirements). Required for the Elicitation `E` and Scope `S` axes (they grade *these* against the PRD). When absent, `Final`/`T` still run, but report `E`/`S` as `n/a — no derived spec`. The **PRD remains the source of truth** for what counts as "expected"; the derived spec is what gets graded for respect and extraction.
+
+**Artifact shape is framework-specific — discover it, do not assume `spec.md`.** Frameworks differ in how they lay out the derived spec, and the same framework changes across versions. Two shapes are common:
+
+| Shape | Looks like | Read as |
+| --- | --- | --- |
+| Single-file | `spec.md` + `tasks.md` | one derived spec |
+| Multi-spec | `overview.md` + `specs/NN-slug.md` (one spec per context/activity) + a shared or per-spec `tasks.md` | **the union of every file under `specs/` is the derived spec** |
+
+List the framework's spec directory before scoring. In the multi-spec shape, `E`, `S`, and the frozen AC list are computed over the **union of all spec files** — never over one of them — and evidence cites the specific file (`specs/02-idempotencia.md:14`). Missing one spec file silently shrinks the `E_recall` denominator and hides plan drift.
+
+**The framework's own verification reports are not evidence.** Some frameworks write self-verification artifacts (a `validation.md`, a `validation/NN-slug.md`, a per-spec PASS verdict). These are the *subject's* claims about itself. Never cite one as `file:line` evidence for an `I`- or `T`-check, and never let a self-reported PASS substitute for reading the code path or the assertion (Core rule 3). They are useful only as a *pointer* to where to look, and as a scoreable claim: a self-reported PASS on an AC you score UNMET is a finding worth reporting.
 
 **Scoping the diff.** Before scoring, use git to identify which files changed for this implementation. That **diff surface** is the primary search scope for all `file:line` evidence in steps 4 and 8:
 
@@ -72,10 +83,12 @@ These five rules govern every score. They exist to make the grade auditable and 
 The grade must be stable: the **same PRD + same commit** must yield the **same `Final`** across runs and evaluators. Obey all of:
 
 1. **Freeze the AC list AND its checklist (the single biggest drift source).** AC enumeration and check granularity are decided **once** and pinned, because both `I`, `T`, and the `Story_score` denominator depend on them:
-   - If `spec.md` with stable requirement IDs exists, the AC list and IDs are frozen — use them verbatim; do not re-split or merge.
+   - If the framework produced stable requirement IDs, the AC list and IDs are frozen — use them verbatim; do not re-split or merge. In the multi-spec shape, collect the IDs from **every** file under `specs/` (each spec mints its own prefix) into one flat AC list; the split into spec files is the framework's packaging, not a scoring boundary.
    - Derive the binary checklist for each AC once and persist it to `<spec-folder>/evaluations/_ac-baseline.md` (IDs + verbatim AC text + the I-checks and T-checks). **Every implementation of that PRD is scored against the identical checklist.**
    - One AC = one testable assertion of intent; one check = one atomic, observable yes/no proposition. Do not collapse distinct behaviors into one check, nor split one behavior across several.
 2. **Priority comes from the PRD, never inferred silently.** Use the PRD's explicit P0/P1/P2 labels. If a story is unlabeled, mark its priority `ASSUMED` in the report and list it under *Assumptions*; never let an inferred priority silently move the `3/2/0` weights.
+
+   **Never copy the framework's priority labels — the scales differ.** A derived spec carries its own priority column, and frameworks do not agree on what `P1` means: some use `P0 = core MVP`, others use `P1 = MVP, P2 = should-have, P3 = nice-to-have`. Reading `P1` off a derived spec and feeding it into this table silently demotes an MVP story from weight 3 to weight 2, and drops a should-have to 0. Map every story back to the **PRD's** label by matching the story, not the letter. When a framework's label contradicts the PRD's, that mismatch itself is a finding — report it under *Assumptions*.
 3. **Round once, at the end.** Carry full precision through the arithmetic; round only the reported `AC_score`, `Story_score`, and `Final` to **2 decimals**. Band assignment uses the rounded `Final`.
 4. **Compute, don't calculate.** The roll-up (`Σw`, every `Story_score`, `Final`, `Adjusted Final`) MUST be computed by executing a script (e.g. `node -e` / `python3 -c`) that takes the per-AC `I`/`T` fractions and the priority-weight table as input, with the script's output pasted into the report. Never do the arithmetic mentally or by hand — a hand-summed denominator (`Σw`) is a known failure mode that silently shifts the grade band. `Σw` must be derived inside the script from the same priority table shown in the report, not typed in as a literal.
 5. **Self-consistency ensemble (k = 3).** Evaluate the checklist **three times independently** at low/zero temperature and take the **majority MET/UNMET per check** before computing any number. Majority voting over k=3 removes most stochastic flips at low cost. If the three passes disagree on a check, that check is borderline — keep the majority verdict and note it; persistent disagreement means the check wording is ambiguous (sharpen it in the baseline, see Calibration).
@@ -171,7 +184,7 @@ LLM judges have well-documented biases; hold these explicitly:
 - **Scope Adherence `S`** — `pass` / `partial` / `fail`, governed by the **traceability principle: every built behavior must trace to a sanctioned source** (a PRD acceptance criterion → `Final`, or a *valid* `E`-addition). Three checks, each per built behavior:
   - **PRD-boundary** — built something on the PRD's explicit out-of-scope list ⇒ `fail`.
   - **Rogue build** — built something that traces to *neither* a PRD AC *nor* a valid `E`-addition (untraceable / invented) ⇒ `fail`.
-  - **Plan drift** — `spec.md`/`tasks.md` sanctioned a behavior the code didn't build (or left half-built / inconsistent) ⇒ `partial`.
+  - **Plan drift** — the derived spec/task artifacts sanctioned a behavior the code didn't build (or left half-built / inconsistent) ⇒ `partial`. In the multi-spec shape this has a coarse, cheap form worth checking first: **a spec file with no task referencing it, or with no code traceable to it, is plan drift for that whole context** — the framework specified a slice and never built it.
   Everything traces cleanly ⇒ `pass`. Report the failing/partial behaviors with `file:line`. **A valid requirement the framework derived into the spec but correctly did NOT build (because it is out of scope) is good discipline — it is *not* an `S` penalty;** record it as deferred-valid under `E`.
 - **Engineering Gates `G`** — `build`, `lint`, `unit`, `e2e`. **Each gate must be an actually-executed `✓`/`✗` or an explicit `not-run` (with reason, e.g. e2e infra unavailable).** Never report a gate as passing without running it. **The `build` gate is pinned mechanically to remove evaluator discretion:** pick the project's canonical build command once per benchmark (the build script the repo documents) and define the gate as that command exiting `0` — nothing else decides it. Record the exact command in the report so every run uses the identical gate. A pre-existing, unrelated toolchain failure in code the change didn't touch (e.g. a known typecheck error in an untouched migration path) is a **documented non-graded NOTE**, not a `✗`: it does not gate `build` and does not trigger `Adjusted Final`. Record it in the report as a known note, but the `build` verdict follows only the pinned build command's exit code. **Probe-before-not-run:** a gate may only be reported `not-run` after a recorded real attempt — the command executed (or the prerequisite check, e.g. `docker ps` for e2e infra) and its error output pasted as evidence. A reason without an attempt is not valid; the gate stays *not yet scored*, exactly like an UNMET without a search (Core rule 2 applied to gates). **Only a confirmed-red gate (`✗`) triggers `Adjusted Final = Final × 0.5`**; a `not-run` gate cannot grant or deduct credit — it is reported as a known blind spot. The unadjusted `Final` stays reported for comparison. A red gate is **never** fixed by the evaluator (Core rule 5) — record `✗`, adjust, and list the fix.
 - **Test Distribution `D`** — every feature test classified into one of three tiers, reported as counts **and** % of the suite. Shows where the testing effort went; never inflates `Final`. See below.
@@ -194,13 +207,13 @@ Report `D` as a table of `tier → count → %` over total feature tests, plus a
 
 ## Elicitation `E` — how well the framework *extracts* requirements (reported beside; never folded into Final)
 
-`E` grades the SDD-derived `spec.md`/`tasks.md` against the PRD: did the framework surface the implicit requirements a senior engineer would insist on, **and** did it do so cleanly (no hallucinated or contradictory additions)? This is the "value beyond transcription" of an SDD framework. It evaluates the **spec artifacts, not the code**. Like `R`/`S`/`D`, it is reported beside `Final` so the fidelity grade stays comparable.
+`E` grades the SDD-derived spec + task artifacts (single `spec.md`, or the union of `specs/*.md`) against the PRD: did the framework surface the implicit requirements a senior engineer would insist on, **and** did it do so cleanly (no hallucinated or contradictory additions)? This is the "value beyond transcription" of an SDD framework. It evaluates the **spec artifacts, not the code**. Like `R`/`S`/`D`, it is reported beside `Final` so the fidelity grade stays comparable.
 
 Three binary-checklist sub-metrics:
 
 ### `E_recall` — did it find what it should have?
 
-Run the **frozen implicit-requirement category rubric** below. For each category, mark **Addressed** (cite `spec.md:line`), **Missed**, or **N/A** (the PRD/domain makes it irrelevant). The rubric is PRD-agnostic and reusable, so recall is reproducible without per-PRD gold labeling.
+Run the **frozen implicit-requirement category rubric** below. For each category, mark **Addressed** (cite `<spec-file>:line`), **Missed**, or **N/A** (the PRD/domain makes it irrelevant). The rubric is PRD-agnostic and reusable, so recall is reproducible without per-PRD gold labeling.
 
 ```
 E_recall = Addressed / (Addressed + Missed)        # N/A excluded
@@ -223,7 +236,7 @@ E_recall = Addressed / (Addressed + Missed)        # N/A excluded
 
 ### `E_precision` — is the signal clean, or gold-plating?
 
-Build the **added-requirement ledger**: every requirement in `spec.md`/`tasks.md` *not traceable to a PRD line*. Adjudicate each, binary, with a one-line warrant + `spec.md:line`:
+Build the **added-requirement ledger**: every requirement in the derived spec/task artifacts *not traceable to a PRD line*. Adjudicate each, binary, with a one-line warrant + a `<spec-file>:line` citation:
 
 | Verdict | Meaning |
 | --- | --- |
@@ -263,11 +276,11 @@ Copy this checklist and track progress:
 
 ```
 FRAMEWORK — respect & extract requirements
-- [ ] 1. Locate PRD, spec.md/tasks.md. Run git diff to identify changed files (diff surface). Use the diff surface as the primary search scope for implementation and test evidence throughout steps 4 and 8
+- [ ] 1. Locate the PRD and list the framework's spec artifacts (single `spec.md`, or `overview.md` + every `specs/*.md`). Run git diff to identify changed files (diff surface). Use the diff surface as the primary search scope for implementation and test evidence throughout steps 4 and 8
 - [ ] 2. Enumerate stories + ACs; tag priority; mark out-of-scope items
 - [ ] 3. Build/load the frozen binary checklist per AC (I-checks + T-checks) → _ac-baseline.md
 - [ ] 4. Score I-checks MET/UNMET with file:line evidence (record searches before any UNMET)
-- [ ] 5. Elicitation E: run the category rubric (E_recall) + added-requirement ledger (E_precision, E_justified) → freeze the `valid E-additions` set
+- [ ] 5. Elicitation E: run the category rubric (E_recall) + added-requirement ledger (E_precision, E_justified) over the UNION of all spec files → freeze the `valid E-additions` set
 - [ ] 6. Scope S: trace every built behavior (PRD-boundary / rogue-build / plan-drift)
 
 HARNESS — ensure they are all implemented
@@ -297,7 +310,7 @@ git status --short                    # for untracked new files
 Record the file list in the report. Steps 4 and 8 use it as the first set of paths to inspect.
 - **Step 2** — Out-of-scope items from the PRD's explicit out-of-scope / non-goals section (whatever heading the PRD uses) get `w=0`. Absence is **not** a defect. Do not score them.
 - **Step 3** — Reuse the existing `_ac-baseline.md` if present; otherwise create it and treat it as the contract for all future runs of this PRD. Include only observable-behavior clauses as checks.
-- **Step 5** — `E` grades `spec.md`/`tasks.md`, not code. The ledger's *valid* additions define the `valid E-additions` set used by Steps 6 and 7. Mark each valid addition built/deferred.
+- **Step 5** — `E` grades the derived spec/task artifacts, not code. In the multi-spec shape, run the rubric once over the union of `specs/*.md` — not once per spec file — or the recall denominator is wrong. The ledger's *valid* additions define the `valid E-additions` set used by Steps 6 and 7. Mark each valid addition built/deferred.
 - **Step 6** — Traceability: a built behavior with no PRD AC and no valid `E`-addition is a rogue build (`fail`). A deferred-valid out-of-scope addition is **not** a penalty.
 - **Step 7** — The harness denominator is the **sanctioned set (PRD ACs ∪ valid E-additions)**. A valid extracted requirement with no test is a `T` miss, not an `E` miss.
 - **Step 8** — Binary only: MET (evidence) or UNMET (searched, absent). No partial per-check values.
@@ -333,6 +346,8 @@ A complete applied evaluation (an example billing service's P0 "Start Free Trial
 - Marking a gate `not-run` without a recorded attempt (command + error output). "Infra not available" without a probe is fabricated evidence.
 - Fixing the code under evaluation to turn a red gate green — the evaluator is read-only over the subject; a red gate is scored `✗` and the fix goes in the report.
 - Hand-computing the roll-up (`Σw`, `Final`) instead of executing it as a script and pasting the output.
+- Assuming the derived spec is a single `spec.md` and scoring `E`/`S` against a fraction of a multi-spec layout — the denominator shrinks and plan drift hides.
+- Citing the framework's own validation/verification report as evidence for a check, or treating its self-reported PASS as coverage.
 - Penalizing missing out-of-scope features.
 - Folding `E` or `S` into `Final` — the headline grade must mean only "fidelity to the given PRD" or comparability breaks.
 - Penalizing a valid requirement the framework extracted but correctly *deferred* as out-of-scope (that is good discipline, not a scope failure).

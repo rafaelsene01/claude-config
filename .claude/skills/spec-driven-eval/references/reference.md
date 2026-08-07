@@ -8,7 +8,8 @@ Copy and fill. Replace bracketed text; keep the section order. `I` and `T` are *
 # Evaluation — [Priority]: [Story title]
 
 **Feature**: [feature name]
-**Source of truth**: [PRD ref] (cross-ref [spec.md IDs] if present)
+**Source of truth**: [PRD ref] (cross-ref derived requirement IDs if present)
+**Derived spec artifacts scored**: [`spec.md`, or the list of `specs/*.md` files in the union]
 **AC baseline**: [_ac-baseline.md ref — frozen checklist used]
 **Judge model**: [model] (author model: [model] — flag if same)
 **Module / paths**: [where the code lives]
@@ -30,18 +31,18 @@ Per-AC: **I = MET / total** → AC1 = x/y = X.XX
 # FRAMEWORK — extract & respect
 
 ## Elicitation E — category rubric (recall)
-| # | Category | Verdict | Evidence (spec.md:line) / why N/A |
+| # | Category | Verdict | Evidence (`<spec-file>:line`) / why N/A |
 | --- | --- | --- | --- |
-| 1 | Input validation & bounds | Addressed/Missed/N-A | `spec.md:line` |
+| 1 | Input validation & bounds | Addressed/Missed/N-A | `<spec-file>:line` |
 | ... | ... | ... | ... |
 
 **E_recall = Addressed / (Addressed + Missed) = X.XX**
 
 ## Elicitation E — added-requirement ledger (precision + justification)
-| # | Requirement added beyond PRD | Verdict | Built? | Justified? | Evidence (spec.md:line) + warrant |
+| # | Requirement added beyond PRD | Verdict | Built? | Justified? | Evidence (`<spec-file>:line`) + warrant |
 | --- | --- | --- | --- | --- | --- |
-| A1 | [requirement] | Valid-necessary | built | yes | `spec.md:line` — [why] |
-| A2 | [requirement] | Invalid (creep/hallucination) | — | no | `spec.md:line` — [why] |
+| A1 | [requirement] | Valid-necessary | built | yes | `<spec-file>:line` — [why] |
+| A2 | [requirement] | Invalid (creep/hallucination) | — | no | `<spec-file>:line` — [why] |
 
 **E_precision = valid / total = X.XX** · **E_justified = justified / total = X.XX**
 `valid E-additions` set (used by S + harness denominator): [A1, …]
@@ -50,7 +51,7 @@ Per-AC: **I = MET / total** → AC1 = x/y = X.XX
 | Built behavior | Traces to | Verdict | Evidence (file:line) |
 | --- | --- | --- | --- |
 | [behavior] | PRD AC1 / valid add A1 / none | pass / fail (rogue) / fail (PRD out-of-scope) | `path:line` |
-| [planned, not built] | spec/tasks | partial (plan drift) | `spec.md:line` |
+| [planned, not built] | spec/tasks | partial (plan drift) | `<spec-file>:line` |
 
 **S = pass / partial / fail** (deferred-valid out-of-scope additions are NOT penalized)
 
@@ -152,6 +153,8 @@ These are reference verdicts. Match your verdicts to the reasoning style, not ju
 ## 3. Worked example — billing service P0: Start Free Trial Without a Card
 
 Real evaluation rebuilt on the binary checklist. Use it as the bar for rigor and evidence. The example happens to be a NestJS + Stripe billing service (TypeORM, Jest) with concrete `file:line` evidence — the methodology itself is stack-agnostic; treat the file paths, frameworks, and commands below as illustrative of the level of rigor, not as required tooling.
+
+> **Artifact shape, read literally, is out of date on purpose.** This evaluation graded a framework that emitted a single `spec.md`, so every citation below reads `spec.md:line`. Mirror the *rigor* — binary checks, `file:line` evidence, searches recorded before any UNMET — not the filename. Against a multi-spec framework the same evaluation cites `specs/NN-slug.md:line`, and the AC list is the union of every file under `specs/` (see the artifact-shape table in `SKILL.md`).
 
 ### Acceptance criteria (from PRD, aligned with `spec.md` STRIPE-01..05)
 - AC1 — Auth user starts trial with `planId` (+ optional `trialDays`); create Stripe customer if none + **trialing** sub **without payment method**; persist; return `Trialing` + end date.

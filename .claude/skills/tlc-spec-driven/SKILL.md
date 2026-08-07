@@ -1,132 +1,142 @@
 ---
 name: tlc-spec-driven
-description: Project and feature planning with 5 adaptive phases - Explore, Specify, Design, Tasks, Execute. Always starts by grilling the user with rounds of questions until the demand is fully understood, then splits the spec into multiple self-contained files (one per cohesive capability) with a tasks.md Spec Map controlling status and parallel waves. Auto-sizes depth by complexity. Creates atomic tasks with verification criteria, atomic git commits, requirement traceability, and persistent memory across sessions. Stack-agnostic. Use when (1) Starting new projects (initialize vision, goals, roadmap), (2) Working with existing codebases (map stack, architecture, conventions), (3) Planning features (requirements, design, task breakdown), (4) Implementing with verification and atomic commits, (5) Quick ad-hoc tasks (bug fixes, config changes), (6) Tracking decisions/blockers/deferred ideas across sessions, (7) Pausing/resuming work. Triggers on "initialize project", "map codebase", "explore demand", "grill me", "specify feature", "discuss feature", "design", "tasks", "implement", "validate", "verify work", "UAT", "quick fix", "quick task", "pause work", "resume work". Do NOT use for architecture decomposition analysis (use architecture skills) or technical design docs (use create-technical-design-doc).
+description: Feature planning and implementation with 4 adaptive phases (Specify, Design, Tasks, Execute). Opens with a relentless round-based grilling interview (design tree + frontier) that explores the codebase and interrogates the demand until nothing is silently assumed. Splits each feature into one spec per context/activity so specs can be executed and verified independently. Auto-sizes depth by complexity. Writes testable requirements in EARS notation, atomic tasks, atomic Conventional Commits, and requirement traceability. Ships deterministic Python validation scripts so structural gates are enforced by code, not memory. Features an independent per-spec Verifier (author != verifier, evidence-or-zero), a discrimination sensor, a decision log (STATE.md), a test-coverage matrix, and a self-improving lessons layer. Stack-agnostic and tool-agnostic. Use when (1) planning features, (2) implementing with verification and atomic commits, (3) validating an implementation against a spec. Triggers on "specify feature", "grill me", "discuss feature", "design", "tasks", "implement", "validate", "verify work", "UAT", "record decision", "pause work", "resume work". Do NOT use for pure architecture decomposition analysis or standalone technical design documents.
 license: CC-BY-4.0
 metadata:
   author: Felipe Rodrigues - github.com/felipfr
-  version: 2.1.0
+  version: 4.0.0
 ---
 
 # Tech Lead's Club - Spec-Driven Development
 
-Plan and implement projects with precision. Granular tasks. Clear dependencies. Right tools. Zero ceremony.
+Plan and implement features with precision. Granular tasks. Clear dependencies. Right tools. Zero ceremony.
 
 ```
-┌─────────┐   ┌──────────┐   ┌──────────┐   ┌─────────┐   ┌─────────┐
-│ EXPLORE │ → │ SPECIFY  │ → │  DESIGN  │ → │  TASKS  │ → │ EXECUTE │
-└─────────┘   └──────────┘   └──────────┘   └─────────┘   └─────────┘
-  required†     required       optional*     optional*     required
+┌──────────────────────┐   ┌──────────┐   ┌─────────┐   ┌─────────┐
+│ SPECIFY              │ → │  DESIGN  │ → │  TASKS  │ → │ EXECUTE │
+│ grill → split specs  │   └──────────┘   └─────────┘   └─────────┘
+└──────────────────────┘     optional*      optional*     required
+        required
 
 * Agent auto-skips when scope doesn't need it
-† Skipped only in quick mode
 ```
 
-**Explore is a hard gate.** No spec, no task, no code until the question frontier is empty and
-the user confirms shared understanding. See [exploration.md](references/exploration.md).
+**Two invariants that shape everything below:**
+
+1. **Specify opens with a grilling interview** - a round-based design tree, not a checklist. Facts come from the codebase (sub-agents), decisions come from the user. Nothing is written until the frontier is empty and the user confirms shared understanding. See [specify.md](references/specify.md).
+2. **A feature is many specs, not one.** Each context/activity gets its own self-contained spec file under `specs/`, so a worker can read exactly one spec and execute it without loading the whole feature. See [specify.md](references/specify.md#2-decompose-into-per-context-specs).
+
+## Critical Rules (read before acting)
+
+**Loading this skill's files.** Reference files live under `references/` in this skill's own directory (where this `SKILL.md` resides). Resolve them relative to the skill directory - never the workspace root - and load them through the active skill by name; never assume a fixed install path. When a step tells you to read a reference, **read it completely (to EOF)** before acting - never act on a partial/truncated read.
+
+**Running this skill's scripts.** Every `scripts/*.py` shipped with this skill lives under that same skill directory. Resolve the skill directory first, then invoke `python3 <skill-dir>/scripts/<name>.py ...`. Never run `python3 scripts/...` from the consuming project root - that looks for a project-local `scripts/` tree that is not this skill. Project data under `.specs/` is still read/written relative to the project root (pass `--root` when the cwd is elsewhere). Below, `<skill-dir>` means the directory that contains this `SKILL.md`.
+
+**Execution contract - every task, non-negotiable (holds even if you do not open the reference files):**
+
+1. Tests derive from the spec's acceptance criteria and assert spec-defined outcomes - they never mirror the implementation.
+2. The gate must pass (tests pass) before a task is done - the test runner decides, not self-assessment.
+3. One atomic commit per task. Mark the task complete in `tasks.md` (and update spec traceability when used) **before** that commit, and include those updates in the same commit. Never batch tasks; never weaken, skip, or delete tests to make them pass.
+4. After the last task **of each spec**, a fresh **Verifier always runs automatically** (author ≠ verifier) - spec-anchored outcome check + discrimination sensor, scoped to that spec. It is never optional and never prompted. See Sub-Agent Delegation.
+5. **Blast radius:** approving a spec or tasks authorizes local implementation and local commits only. `git push`, force-push, deploy, production DB changes, and other remote / externally visible / destructive operations require an explicit go-ahead for that action.
+
+**Deterministic gates run before human review - not from memory.** The structural gates for the spec and tasks are enforced by scripts in this skill's `scripts/` directory, so they cannot silently drift when the model forgets a step:
+
+- Before confirming the spec set: `python3 <skill-dir>/scripts/validate_spec.py <feature>` (closure gate, run across `overview.md` **and every file in `specs/`**: EARS-shaped ACs, filled assumptions, well-formed requirement IDs, required sections, spec-index parity, unique requirement-ID prefixes, resolvable and acyclic spec dependencies).
+- Before presenting tasks for approval: `python3 <skill-dir>/scripts/validate_tasks.py <tasks-path-or-feature>` (granularity smell, diagram-vs-`Depends on` parity within a phase, no forward-phase dependency, every task carries `Spec` + `Tests` + `Gate`, every phase belongs to exactly one spec, no cross-spec dependency that the spec graph does not declare).
+- On each commit: `python3 <skill-dir>/scripts/check_commit.py --message "<msg>"` (Conventional Commits). Optionally wire it as a git `commit-msg` guard (git only, no agent dependency) - see [implement.md](references/implement.md).
+- Before declaring a spec or the feature done: `python3 <skill-dir>/scripts/validate_state.py <feature>` (completion gate: **every** spec has its Verifier report at `validation/<spec-id>.md`, each verdict filled to PASS and citing `file:line` evidence - a missing, FAIL, placeholder, or evidence-free report fails). Runs automatically at the closing step of each spec and of Execute; it is not a manual step.
+
+A non-zero exit means STOP and fix before proceeding. Skip a script only when no code-execution tool is available; then perform the same checks by reading the artifact.
+
+**Before Execute:** read [implement.md](references/implement.md) completely and run `<skill-dir>/scripts/validate_tasks.py`; if a formal `tasks.md` packs into more than one task-budgeted batch (> ~8 tasks), present the sub-agent offer first (see Sub-Agent Delegation).
 
 ## Auto-Sizing: The Core Principle
 
 **The complexity determines the depth, not a fixed pipeline.** Before starting any feature, assess its scope and apply only what's needed:
 
-| Scope       | What                     | Explore                        | Specify                                                 | Design                                          | Tasks                         | Execute                                               |
-| ----------- | ------------------------ | ------------------------------ | ------------------------------------------------------- | ----------------------------------------------- | ----------------------------- | ----------------------------------------------------- |
-| **Small**   | ≤3 files, one sentence   | Skip — **quick mode**          | **Quick mode** — skip pipeline entirely                 | -                                               | -                             | -                                                     |
-| **Medium**  | Clear feature, <10 tasks | 1-2 rounds                     | 1-3 spec files + INDEX                                  | Skip — design inline                            | Skip if 1 spec, else required | Implement + verify                                    |
-| **Large**   | Multi-component feature  | Rounds until frontier is empty | 3-8 spec files + requirement IDs                        | Architecture + components                       | Spec map + full breakdown     | Implement + verify per task                           |
-| **Complex** | Ambiguity, new domain    | Rounds + sub-agent research    | Spec files + [discuss gray areas](references/discuss.md) | [Research](references/design.md) + architecture | Spec map + parallel waves     | Implement + [interactive UAT](references/validate.md) |
+| Scope       | What                     | Grilling                              | Specify                                                                | Design                                          | Tasks                         | Execute                                               |
+| ----------- | ------------------------ | ------------------------------------- | ---------------------------------------------------------------------- | ----------------------------------------------- | ----------------------------- | ----------------------------------------------------- |
+| **Small**   | ≤3 files, one sentence   | Skip - confirm the one-liner back     | One-liner spec (inline), no `specs/` split                              | Skip                                            | Skip                          | Implement + verify inline                             |
+| **Medium**  | Clear feature, <10 tasks | 1-2 rounds, frontier of open decisions | 1-3 specs under `specs/` (brief)                                        | Skip - design inline                            | Skip - tasks implicit         | Implement + verify                                    |
+| **Large**   | Multi-component feature  | Full design-tree grilling to empty frontier | Full spec per context/activity + requirement IDs                   | Architecture + components                       | Full breakdown + dependencies | Implement + verify per task                           |
+| **Complex** | Ambiguity, new domain    | Full grilling + codebase sub-agents    | Spec per context/activity + [discuss gray areas](references/discuss.md) | [Research](references/design.md) + architecture | Breakdown + phase plan        | Implement + [interactive UAT](references/validate.md) |
 
 **Rules:**
 
-- **Explore, Specify and Execute are always required** — understand it, know WHAT, then DO it
-- **Explore is skipped only in quick mode** — everything else earns its rounds of questions
+- **Specify and Execute are always required** - you always need to know WHAT and DO it
+- **Grilling opens Specify** for everything above Small - rounds of questions over a design tree until the frontier is empty; never write specs from an unexplored demand
+- **One spec per context/activity** for Medium and above - a feature directory holds many specs, each executable in isolation
 - **Design is skipped** when the change is straightforward (no architectural decisions, no new patterns)
-- **Tasks is skipped** only when `spec/` holds a single file AND there are ≤3 obvious steps — with multiple spec files, `tasks.md` is the only thing tracking which specs ran
-- **Discuss is triggered within Specify** only when the agent detects ambiguous gray areas that need user input
+- **Tasks is skipped** when there are ≤3 obvious steps (they become implicit in Execute)
+- **Discuss is triggered within Specify** when the agent detects ambiguous gray areas that need user input, or when the feature has any implicit-requirement dimension present (persistence/state, external calls, auth, payments, concurrency, state transitions)
 - **Interactive UAT is triggered within Execute** only for user-facing features with complex behavior
-- **Quick mode** is the express lane — for bug fixes, config changes, and small tweaks
 
-**Safety valve:** Even when Tasks is skipped, Execute ALWAYS starts by listing atomic steps inline (see [implement.md](references/implement.md)). If that listing reveals >5 steps or complex dependencies, STOP and create a formal `tasks.md` — the Tasks phase was wrongly skipped.
+**Safety valve:** Even when Tasks is skipped, Execute ALWAYS starts by listing atomic steps inline (see [implement.md](references/implement.md)). If that listing reveals >5 steps or complex dependencies, STOP and create a formal `tasks.md` - the Tasks phase was wrongly skipped.
 
-## Project Structure
+## .specs Structure
 
 ```
 .specs/
-├── project/
-│   ├── PROJECT.md      # Vision & goals
-│   ├── ROADMAP.md      # Features & milestones
-│   └── STATE.md        # Memory: decisions, blockers, lessons, todos, deferred ideas
-├── codebase/           # Brownfield analysis (existing projects)
-│   ├── STACK.md
-│   ├── ARCHITECTURE.md
-│   ├── CONVENTIONS.md
-│   ├── STRUCTURE.md
-│   ├── TESTING.md
-│   ├── INTEGRATIONS.md
-│   └── CONCERNS.md
-├── features/           # Feature specifications
-│   └── [feature]/
-│       ├── spec/                 # ONE FOLDER, MANY SPECS — one per cohesive capability
-│       │   ├── INDEX.md          # Exploration summary, spec map, global traceability
-│       │   ├── 01-[capability].md
-│       │   ├── 02-[capability].md
-│       │   └── 03-[capability].md
-│       ├── context.md  # User decisions for gray areas (only when discuss is triggered)
-│       ├── design.md   # Architecture & components (only for Large/Complex)
-│       └── tasks.md    # Spec map (execution control) + atomic tasks grouped by spec
-└── quick/              # Ad-hoc tasks (quick mode)
-    └── NNN-slug/
-        ├── TASK.md
-        └── SUMMARY.md
+├── STATE.md            # Project memory: Decisions log (AD-NNN) + Handoff snapshot
+├── LESSONS.md          # Self-improving lessons playbook (rendered by scripts/lessons.py - do not hand-edit)
+├── lessons.json        # Canonical lessons state (machine-owned)
+└── features/           # Feature specifications
+    └── [feature]/
+        ├── overview.md            # Feature-level: problem, goals, out of scope, Spec Index + dependency graph
+        ├── specs/                 # ONE SPEC PER CONTEXT/ACTIVITY - each self-contained and independently executable
+        │   ├── 01-[slug].md
+        │   ├── 02-[slug].md
+        │   └── 03-[slug].md
+        ├── context.md             # User decisions for gray areas (only when discuss is triggered)
+        ├── design.md              # Architecture & components (only for Large/Complex)
+        ├── tasks.md               # Atomic tasks with verification; every task declares `Spec: NN-[slug]`
+        └── validation/            # One Verifier report per spec
+            ├── 01-[slug].md
+            └── 02-[slug].md
 ```
+
+**Why many specs.** A worker executing `02-idempotencia` reads `specs/02-idempotencia.md` plus its slice of `tasks.md` - not the whole feature. That is what makes specs parallelizable and keeps worker context small. The price is that each spec must be self-contained: it repeats the short shared-context digest it needs and names its dependencies explicitly. `overview.md` holds only what is genuinely feature-wide (problem, goals, out-of-scope, index, dependency graph) - it is never required reading for executing a single spec.
+
+**Spec IDs.** A spec's ID is its filename stem: `NN-[slug]` (e.g. `01-webhook-recebimento`). The number fixes reading order for humans; real ordering constraints live in each spec's `Depends on` and in the overview's dependency graph. Every requirement ID inside a spec uses a prefix unique to that spec (`WEBHOOK-01`, `IDEMP-01`) so IDs never collide across the feature.
+
+**Small scope escape hatch.** A Small feature (≤3 files, one sentence) writes a single inline one-liner spec and skips the `specs/` split entirely - splitting one activity into one file per activity buys nothing.
+
+**Legacy layout.** A feature directory that still holds a flat `spec.md` (no `specs/`) keeps working: every script accepts it. Do not migrate an existing feature mid-flight; new features use `specs/`.
+
+**Create artifacts lazily.** Write each file only when its phase actually produces content - never scaffold empty `context.md`, `design.md`, `tasks.md`, or placeholder spec files up front. An empty file signals a phase happened when it did not; absence is the correct state for a skipped phase. The deterministic validators (`scripts/validate_spec.py`, `scripts/validate_tasks.py`, `scripts/check_commit.py`, `scripts/validate_state.py`) ship inside this skill's own `scripts/` directory, alongside `lessons.py`.
 
 ## Workflow
 
-**New project:**
+**New feature:**
 
-1. Initialize project → PROJECT.md + ROADMAP.md
-2. For each feature → Explore → Specify → (Design) → (Tasks) → Execute (depth auto-sized)
+1. **Grill** the demand (rounds over a design tree; sub-agents answer factual questions from the codebase) until the frontier is empty and the user confirms shared understanding
+2. **Specify** - split the demand into contexts/activities, write one spec per context under `specs/`, plus `overview.md`
+3. (Design) → (Tasks) → Execute (depth auto-sized). Execute walks spec by spec; each spec closes with its own Verifier.
 
-**Existing codebase:**
+**Resume work:**
 
-1. Map codebase → 7 brownfield docs
-2. Initialize project → PROJECT.md + ROADMAP.md
-3. For each feature → same adaptive workflow
-
-**Feature flow in detail:**
-
-1. **Explore** — rounds of numbered questions with recommended answers; sub-agents find every environment fact; stop when the frontier is empty and the user confirms
-2. **Specify** — slice the confirmed demand into cohesive capabilities, one self-contained file each, plus `spec/INDEX.md`
-3. **Design** — architecture, when the change needs it
-4. **Tasks** — Spec Map (status + waves) + atomic tasks grouped by spec
-5. **Execute** — wave by wave, one sub-agent per spec, Spec Map updated after each
-
-**Quick mode:** Describe → Implement → Verify → Commit (for ≤3 files, one-sentence scope)
+1. Read `.specs/STATE.md` (Handoff + Decisions).
+2. Reconcile Handoff against git (`branch`, `status --porcelain`, recent commits) and `tasks.md` - evidence wins over a stale snapshot. Full procedure: [memory.md](references/memory.md).
+3. Propose the reconciled next step before writing code.
 
 ## Context Loading Strategy
 
-**Base load (~15k tokens):**
+**On-demand load (only what the current task needs):**
 
-- PROJECT.md (if exists)
-- ROADMAP.md (when planning/working on features)
-- STATE.md (persistent memory)
-
-**On-demand load:**
-
-- Codebase docs (when working in existing project)
-- CONCERNS.md (when planning features that touch flagged areas, estimating risk, or modifying fragile components)
-- TESTING.md (when creating tasks or executing — drives test type assignment and gate checks)
-- spec/INDEX.md (when planning or orchestrating a feature)
-- spec/NN-\*.md (ONE at a time — the slice currently being specified, designed, or implemented)
+- `.specs/STATE.md` - Decisions section (read at Design, re-read on resume); Handoff section (read on resume only)
+- confirmed lessons - load at Specify and Design via `python3 <skill-dir>/scripts/lessons.py list --status confirmed` ([lessons.md](references/lessons.md)); confirmed only, never candidates
+- `overview.md` (only when planning the feature as a whole, or when picking the next spec)
+- `specs/NN-[slug].md` - **the one spec you are working on**, never the whole `specs/` directory
 - context.md (when designing or implementing from user decisions)
 - design.md (when implementing from design)
 - tasks.md (when executing tasks)
 
 **Never load simultaneously:**
 
-- Multiple spec files of the same feature (that is what the split is for — INDEX.md is the only cross-spec view)
-- Multiple feature specs
+- Multiple specs of the same feature (the split exists precisely so you don't have to)
+- Multiple feature directories
 - Multiple architecture docs
-- Archived documents
 
 **Target:** <40k tokens total context
 **Reserve:** 160k+ tokens for work, reasoning, outputs
@@ -134,82 +144,41 @@ the user confirms shared understanding. See [exploration.md](references/explorat
 
 ## Sub-Agent Delegation
 
-Use sub-agents (the Task tool or equivalent) to keep the main context window lean and enable
-parallel execution. The orchestrating agent plans and coordinates; sub-agents do the heavy lifting.
+**Trigger:** count total tasks. If the feature packs into more than one task-budgeted batch (> ~8 tasks) → offer sub-agents; if it fits a single batch (≤ ~8 tasks) → execute inline.
 
-**When to delegate to a sub-agent:**
+**Offer-then-confirm** - never auto-spawn. The user must accept before any sub-agent is dispatched.
 
-| Activity | Delegate? | Why |
-|---|---|---|
-| Fact-finding during Exploration | Yes | Facts are the agent's job, never the user's — and the search output must not pollute the interview context |
-| Research (design phase, brownfield mapping) | Yes | Research output is large; only the summary matters to the main context |
-| Implementing a spec in a parallel wave | Yes (one per spec) | The only way to actually run specs in parallel |
-| Implementing a task | Yes | File reads, edits, test output consume context; only the result matters |
-| Parallel `[P]` tasks | Yes (one per task) | The only way to actually run tasks in parallel |
-| Sequential tasks with no `[P]` | Yes | Keeps implementation artifacts out of the main context |
-| Asking the user questions, planning, task creation, validation reports | No | These require the full accumulated context to be coherent |
-| Quick mode tasks | No | Too small to justify the overhead |
+**One worker per task-budgeted batch (~7 tasks, whole phases, never crossing a spec):** Phases stay the semantic/dependency unit; a **batch** is the execution unit - one or more *consecutive whole phases* packed to ~7 tasks. Because every phase belongs to exactly one spec (enforced by `validate_tasks.py`), a batch never mixes specs: the cut lands on a phase boundary and at every spec boundary. Walk phases in order, accumulate whole phases into the current batch until it reaches the budget or the spec changes, then start the next - **never split a phase** across workers. ~20 tasks → ~3 workers; scales linearly (40 → ~6). Each worker receives **only its own spec file** plus its task definitions, executes all its tasks in order (implement → gate → atomic commit), then reports a compact summary (tasks done, commit hashes, test counts, deviations). Batches run sequentially - a batch never starts until the previous one reports all tasks complete. Workers never spawn further sub-agents.
 
-**Context each sub-agent receives:**
+**Verifier (always-on, never prompted, one per spec):** After the last task **of a spec** is committed, the orchestrator dispatches a fresh Verifier sub-agent automatically - regardless of phase count, and without waiting for the rest of the feature. Validation never requires a user prompt; it is the closing step of every spec. **Author ≠ verifier**: the Verifier re-derives coverage independently using evidence-or-zero; it does not inherit the author's mental model. The Verifier: (1) performs a **spec-anchored outcome check** - confirms each test's asserted value matches the spec-defined expected outcome, flags spec-precision gaps; (2) runs a **discrimination sensor** - injects behavior-level faults in an isolated scratch (temp worktree or file copies - never `git stash`), confirms tests kill them, discards the scratch and verifies real-tree porcelain matches the pre-sensor baseline; surviving mutants become fix tasks; (3) writes `.specs/features/[feature]/validation/<spec-id>.md` (PASS/FAIL, per-AC evidence, sensor result, diff range); (4) returns a compact verdict + ranked gap list to the orchestrator in chat. Gaps become fix tasks scoped to that spec; the fix→re-verify loop is bounded to 3 iterations before escalating. (5) **distills lessons** - turns each grounded failure (surviving mutant, spec-precision gap, failed AC, SPEC_DEVIATION) into a reusable project-local lesson via `<skill-dir>/scripts/lessons.py`; a clean PASS records nothing (see [lessons.md](references/lessons.md)). The feature is done only when every spec has a PASS report.
 
-The orchestrating agent MUST provide each sub-agent with:
-- The specific task definition from tasks.md (Spec, What, Where, Depends on, Reuses, Done when, Tests, Gate)
-- Its spec slice — `spec/NN-*.md` — and ONLY that one
-- Relevant coding principles and conventions (coding-principles.md, CONVENTIONS.md)
-- TESTING.md, if it exists (for gate check commands and test patterns)
-- Any design context the task references
+**Model tier per role (only if the harness supports choosing a model per sub-agent).** Match the reasoning cost to the work instead of paying top-tier reasoning for boilerplate. A batch worker on a mechanical, low-ambiguity phase (entities, config, wiring, straightforward CRUD) runs on a faster/cheaper tier; a worker on a core-domain or high-ambiguity phase, and the Design phase itself, runs on a high-reasoning tier; the Verifier runs on a mid-to-high tier because it does adversarial reasoning and designs mutations. This is a portable recommendation: if the harness cannot set a per-sub-agent model, ignore it. Full rubric in [sub-agents.md](references/sub-agents.md).
 
-The sub-agent does NOT receive: other spec files, other tasks' definitions, accumulated chat history,
-validation reports from other tasks, or STATE.md (unless the task explicitly references a decision/blocker).
+**Standalone fallback:** Without sub-agents, run `validate.md` as an independent fresh-eyes pass after the final commit - including the spec-anchored check and discrimination sensor.
 
-**What sub-agents return:**
-
-Each sub-agent reports back:
-- Status: Complete | Blocked | Partial
-- Files changed: [list]
-- Gate check result: [pass/fail + test counts]
-- SPEC_DEVIATION markers (if any)
-- Issues encountered (if any)
-
-The orchestrating agent uses this to update tasks.md status, traceability, and decide next steps.
+Full mechanics (worker payload, compact summary format, failure handling, context sizing, model tier, Verifier report format): [sub-agents.md](references/sub-agents.md).
 
 ## Commands
-
-**Project-level:**
-| Trigger Pattern | Reference |
-|----------------|-----------|
-| Initialize project, setup project | [project-init.md](references/project-init.md) |
-| Create roadmap, plan features | [roadmap.md](references/roadmap.md) |
-| Map codebase, analyze existing code | [brownfield-mapping.md](references/brownfield-mapping.md) |
-| Document concerns, find tech debt, what's risky | [concerns.md](references/concerns.md) |
-| Record decision, log blocker, add todo | [state-management.md](references/state-management.md) |
-| Pause work, end session | [session-handoff.md](references/session-handoff.md) |
-| Resume work, continue | [session-handoff.md](references/session-handoff.md) |
 
 **Feature-level (auto-sized):**
 | Trigger Pattern | Reference |
 |----------------|-----------|
-| **Any feature-level request** (entry gate — runs before Specify) | [exploration.md](references/exploration.md) |
-| Explore demand, grill me, ask me questions, understand the demand | [exploration.md](references/exploration.md) |
-| Specify feature, define requirements | [specify.md](references/specify.md) |
+| Grill me, interrogate this demand, stress-test the plan | [specify.md](references/specify.md#1-grill-the-demand) |
+| Specify feature, define requirements, split into specs | [specify.md](references/specify.md) |
 | Discuss feature, capture context, how should this work | [discuss.md](references/discuss.md) |
 | Design feature, architecture | [design.md](references/design.md) |
 | Break into tasks, create tasks | [tasks.md](references/tasks.md) |
 | Implement task, build, execute | [implement.md](references/implement.md) |
 | Validate, verify, test, UAT, walk me through it | [validate.md](references/validate.md) |
-| Quick fix, quick task, small change, bug fix | [quick-mode.md](references/quick-mode.md) |
 
-## Skill Integrations
-
-This skill coexists with other skills. Before specific tasks, check if complementary skills are installed and prefer them when available.
-
-### Diagrams → mermaid-studio
-
-Whenever the workflow requires creating or updating a diagram (architecture overviews, data flows, component diagrams, sequence diagrams, etc.), **always** check if the `mermaid-studio` skill is installed in the user's environment before proceeding. If it is installed, delegate all diagram creation and rendering to it. If it is not installed, proceed with inline mermaid code blocks as usual and recommend the user install `mermaid-studio` for richer diagram capabilities (rendering to SVG/PNG, validation, theming, etc.). Display this recommendation at most once per session.
-
-### Code Exploration → codenavi
-
-Whenever the workflow requires exploring or discovering things in an existing repository (brownfield mapping, code reuse analysis, pattern identification, dependency tracing, etc.), **always** check if the `codenavi` skill is installed in the user's environment before proceeding. If it is installed, delegate code exploration and navigation tasks to it. If it is not installed, fall back to the built-in code analysis tools (see [code-analysis.md](references/code-analysis.md)) and recommend the user install `codenavi` for more effective codebase exploration. Display this recommendation at most once per session.
+**Memory:**
+| Trigger Pattern | Reference |
+|----------------|-----------|
+| Record decision, this is a project-level decision | [memory.md](references/memory.md) |
+| Pause work, end session, I need to stop | [memory.md](references/memory.md) |
+| Resume work, continue, pick up where we left off | [memory.md](references/memory.md) |
+| Load lessons, what have we learned, apply past lessons | [lessons.md](references/lessons.md) |
+| Record lesson, distill lessons (auto-runs after validation) | [lessons.md](references/lessons.md) |
 
 ## Knowledge Verification Chain
 
@@ -217,23 +186,25 @@ When researching, designing, or making any technical decision, follow this chain
 
 ```
 Step 1: Codebase → check existing code, conventions, and patterns already in use
-Step 2: Project docs → README, docs/, inline comments, .specs/codebase/
+Step 2: Project docs → README, docs/, inline comments, `.specs/STATE.md` (Decisions)
 Step 3: Context7 MCP → resolve library ID, then query for current API/patterns
 Step 4: Web search → official docs, reputable sources, community patterns
-Step 5: Flag as uncertain → "I'm not certain about X — here's my reasoning, but verify"
+Step 5: Flag as uncertain → "I'm not certain about X - here's my reasoning, but verify"
 ```
 
 **Rules:**
 
 - Never skip to Step 5 if Steps 1-4 are available
-- Step 5 is ALWAYS flagged as uncertain — never presented as fact
+- Step 5 is ALWAYS flagged as uncertain - never presented as fact
 - **NEVER assume or fabricate.** If you cannot find an answer, say "I don't know" or "I couldn't find documentation for this". Inventing APIs, patterns, or behaviors causes cascading failures across design → tasks → implementation. Uncertainty is always preferable to fabrication.
 
 ## Output Behavior
 
-**Model guidance:** After completing lightweight tasks (validation, state updates, session handoff), naturally mention once that such tasks work well with faster/cheaper models. Track in STATE.md under `Preferences` to avoid repeating. For heavy tasks (brownfield mapping, complex design), briefly note the reasoning requirements before starting.
+**Do the work; do not narrate the machinery.** Produce the right artifact for the phase instead of announcing the phase ("I will now run the Specify phase"). The user judges the output, not a play-by-play of the process. This keeps the flow from reading as robotic.
 
-Be conversational, not robotic. Don't interrupt workflow—add as a natural closing note. Skip if user seems experienced or has already acknowledged the tip.
+**Match effort to the work.** Lightweight steps (feature-level checks, validation, mechanical tasks) do not need top-tier reasoning; heavy steps (complex design, ambiguous features) do. If the harness lets you pick a model per sub-agent, apply the tier rubric in [sub-agents.md](references/sub-agents.md); otherwise proceed and simply invest more care on the heavy steps. Mention this once per session at most, and only if it helps; skip it for an experienced user.
+
+**Write generated artifacts in a plain, decided voice.** Specs, ADRs, validation reports, commit messages, and chat summaries follow the writing rules in [coding-principles.md](references/coding-principles.md): lead with the verdict, state decisions definitively, cut filler and mechanical hedging.
 
 ## Code Analysis
 

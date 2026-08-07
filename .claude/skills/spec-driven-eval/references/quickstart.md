@@ -71,7 +71,7 @@ After cutting your run branch off the base, you **must** scrub the working tree 
 Clean up, at minimum:
 
 - **Compiled / build output** — e.g. build dirs, transpiled output, coverage and cache directories.
-- **Previously generated SDD plan artifacts** — the prior framework's `spec.md`/`tasks.md` and its working directories.
+- **Previously generated SDD plan artifacts** — the prior framework's spec/task files and working directories (a single `spec.md` + `tasks.md`, or a whole `specs/` tree, `overview.md`, `validation/` reports, …). Delete the framework's entire artifact directory, not just the files you remember.
 - **Dependency drift** — reconcile dependencies to the locked versions (a clean, frozen-lockfile install).
 
 Do this *after* cutting the branch and *before* planning, so the cleanup can't wipe the new plan.
@@ -85,7 +85,34 @@ I'm on branch <RUN_BRANCH> (cut from <BASE_REF>).
 Read <FRAMEWORK>'s own planning instructions and follow them exactly. Using ONLY
 the PRD at <PATH TO YOUR PRD> as input, run <FRAMEWORK>'s planning flow to produce
 its spec + tasks artifacts. Plan only — do not write any production code.
+
+If you ask me clarifying questions, I will answer ONLY from the PRD. For anything
+the PRD does not state, I will reply "not in the PRD — use your own recommendation
+and record it as an assumption." Do not wait for product input I cannot give.
 ```
+
+### Answering an interactive planning flow without contaminating the benchmark
+
+Some frameworks plan by interrogating you (rounds of questions, a design-tree
+interview, gray-area discussion). That is a **feature being measured** — the
+Elicitation `E` axis exists precisely to reward surfacing implicit requirements —
+but it is also the biggest fairness leak in a head-to-head benchmark: every fact
+you volunteer is input the other frameworks never received, and the grade stops
+measuring the framework.
+
+Hold one rule: **you are a PRD oracle, not a product owner.**
+
+| The framework asks… | You answer |
+| --- | --- |
+| something the PRD states | quote the PRD, verbatim |
+| something the PRD implies but doesn't state | "not in the PRD — use your recommendation, log it as an assumption" |
+| a genuine product decision the PRD is silent on | same as above — never decide it for them |
+| a fact about the codebase | "look it up yourself" (a framework that asks you to read the code for it is *losing* points, not earning them) |
+
+Apply the identical rule to every framework in the benchmark, and record in the
+report how many questions each one asked and how many you had to deflect —
+a framework that recommends its own defaults and moves on is doing the work;
+one that stalls waiting for product input is offloading it.
 
 ## Session 3 — Implement
 
@@ -93,8 +120,9 @@ Open a new chat on the same branch:
 
 ```
 I'm on branch <RUN_BRANCH>. Read <FRAMEWORK>'s own implementation instructions and
-follow them. Implement STRICTLY from the spec.md/tasks.md on this branch — do NOT
-read the PRD. Write production code plus unit and e2e tests.
+follow them. Implement STRICTLY from the spec + task artifacts on this branch (a
+single spec.md, or every file under specs/) — do NOT read the PRD. Write production
+code plus unit and e2e tests.
 ```
 
 Keeping it PRD-blind here is deliberate: the implementer should only ever see the framework's plan, so the grade measures the framework, not the model backfilling from the PRD.
