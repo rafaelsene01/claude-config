@@ -62,3 +62,9 @@ Habilidades e pacotes de instruções projetados para calibrar e aprimorar o com
 
 * ### [teamchong/pxpipe](https://github.com/teamchong/pxpipe)
   * **Descrição:** Ferramenta de otimização de context window (Image to Prompt). Converte grandes volumes de texto (system prompts, documentação de ferramentas e histórico antigo) em imagens PNG comprimidas. Como os modelos de visão cobram um valor fixo de tokens por imagem, reduz o custo total de tokens de entrada em 50% a 70%.
+
+* ### [PaddlePaddle/PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR)
+  * **Descrição:** Framework de OCR (reconhecimento óptico de caracteres) open-source da Baidu. Permite extrair texto de imagens e documentos, útil para alimentar agentes de IA com conteúdo digitalizado.
+
+* ### [ruvnet/ruview](https://github.com/ruvnet/ruview)
+  * **Descrição:** Plataforma de sensoriamento via WiFi que transforma sinais de rádio em inteligência espacial em tempo real, detectando presença, sinais vitais (respiração e batimentos) e postura corporal sem câmeras ou wearables. Usa nós ESP32 de baixo custo, redes neurais para reconhecimento de atividades/quedas, e integra-se a Home Assistant, Apple Home, Google Home e Alexa via protocolo Matter.
