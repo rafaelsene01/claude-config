@@ -57,8 +57,14 @@ Habilidades e pacotes de instruções projetados para calibrar e aprimorar o com
 * ### [diegosouzapw/OmniRoute](https://github.com/diegosouzapw/OmniRoute)
   * **Descrição:** Roteador inteligente de requisições LLM. Permite gerenciar múltiplos provedores e modelos de IA (OpenAI, Anthropic, Gemini, Ollama, etc.), aplicando estratégias de fallback, balanceamento de carga, monitoramento de custos e controle de latência.
 
+* ### [9Router](https://9router.com/) ([repo](https://github.com/decolua/9router))
+  * **Descrição:** Roteador de IA gratuito e open-source (mesma proposta do `OmniRoute` acima) que unifica o acesso a mais de 40 provedores e 100+ modelos por trás de um único endpoint local. Conecta ferramentas como Claude Code, Cursor, Codex, Cline, Copilot e Gemini CLI a modelos comerciais/gratuitos, com fallback automático ao atingir limites de taxa, tradução entre formatos de API (OpenAI ↔ Claude ↔ Gemini) e compressão de tokens (economia de ~20-40% em saídas de `git diff`, `grep`, `ls`, `tree`, etc.).
+
 * ### [ruvnet/ruflo](https://github.com/ruvnet/ruflo)
   * **Descrição:** Framework open-source para orquestração de múltiplos agentes de IA (*swarm intelligence* e *agentic workflows*). Permite criar fluxos de trabalho colaborativos e distribuídos entre assistentes de IA.
+
+* ### [affaan-m/ECC](https://github.com/affaan-m/ECC)
+  * **Descrição:** Framework open-source (MIT) que dá a agentes de codificação um sistema de engenharia coordenado em vez de depender de prompts repetidos. Implementa o ciclo `plan -> test -> implement -> review -> verify -> remember -> improve` com portões determinísticos de qualidade, e inclui 67 agentes especializados, 284 skills reutilizáveis (TDD, pesquisa, segurança, docs, frontend/backend, ML, ops), hooks/memória para aprendizado contínuo e o scanner de segurança AgentShield. Nativo para Claude Code, com adaptadores para Codex, Cursor, OpenCode, Gemini, Zed e GitHub Copilot.
 
 * ### [teamchong/pxpipe](https://github.com/teamchong/pxpipe)
   * **Descrição:** Ferramenta de otimização de context window (Image to Prompt). Converte grandes volumes de texto (system prompts, documentação de ferramentas e histórico antigo) em imagens PNG comprimidas. Como os modelos de visão cobram um valor fixo de tokens por imagem, reduz o custo total de tokens de entrada em 50% a 70%.
@@ -80,6 +86,9 @@ Habilidades e pacotes de instruções projetados para calibrar e aprimorar o com
 
 * ### [dietrichgebert/ponytail](https://github.com/dietrichgebert/ponytail)
   * **Descrição:** Plugin que faz o agente pensar como "o dev sênior mais preguiçoso da sala", aplicando uma escada de decisão (reutilizar → stdlib → recursos nativos → dependências existentes → solução mínima) antes de escrever qualquer código novo. Resulta em ~54% menos código gerado, mantendo segurança e validação.
+
+* ### [getagentseal/codeburn](https://github.com/getagentseal/codeburn)
+  * **Descrição:** Ferramenta open-source, local e gratuita para rastrear gastos com tokens de IA e seus custos associados, mostrando onde o orçamento é consumido por modelo, projeto e tipo de tarefa. Monitora 36 ferramentas diferentes (Claude Code, Cursor, Codex, Gemini, Grok, etc.) a partir dos arquivos de sessão já presentes na máquina, com dashboard no terminal, painel web com gráficos e app de menu para macOS. Opera 100% offline — nenhum dado sai da máquina — e permite definir limites de gasto em sessões do Claude Code.
 
 #### 🔍 Comparativo: andrej-karpathy-skills vs. caveman vs. ponytail
 
