@@ -68,3 +68,30 @@ Habilidades e pacotes de instruções projetados para calibrar e aprimorar o com
 
 * ### [ruvnet/ruview](https://github.com/ruvnet/ruview)
   * **Descrição:** Plataforma de sensoriamento via WiFi que transforma sinais de rádio em inteligência espacial em tempo real, detectando presença, sinais vitais (respiração e batimentos) e postura corporal sem câmeras ou wearables. Usa nós ESP32 de baixo custo, redes neurais para reconhecimento de atividades/quedas, e integra-se a Home Assistant, Apple Home, Google Home e Alexa via protocolo Matter.
+
+* ### [anthropics/claude-plugins-official (claude-code-setup)](https://github.com/anthropics/claude-plugins-official/tree/main/plugins/claude-code-setup)
+  * **Descrição:** Plugin oficial da Anthropic que analisa a codebase do projeto e recomenda automações sob medida para o Claude Code — servidores MCP, Skills, Hooks, Subagents e Slash Commands. Funciona em modo *read-only* (não altera arquivos), servindo como um assistente de onboarding e otimização de workflow.
+
+* ### [multica-ai/andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills)
+  * **Descrição:** Conjunto de diretrizes de comportamento (via `CLAUDE.md`/plugin) inspiradas nas observações de Andrej Karpathy sobre erros comuns de LLMs ao programar. Ensina o agente a pensar antes de codificar, evitar superengenharia, fazer mudanças cirúrgicas (só o necessário) e definir critérios de sucesso verificáveis antes de executar.
+
+* ### [juliusbrussee/caveman](https://github.com/juliusbrussee/caveman)
+  * **Descrição:** Skill/plugin que faz o agente de IA se comunicar de forma ultra-comprimida ("fala de caveman"), reduzindo em até 65% os tokens de saída em texto corrido sem perder precisão técnica. Possui níveis de intensidade ajustáveis (lite/full/ultra/wenyan), comandos para commits e revisões de PR comprimidos, e compressão de arquivos de memória/contexto.
+
+* ### [dietrichgebert/ponytail](https://github.com/dietrichgebert/ponytail)
+  * **Descrição:** Plugin que faz o agente pensar como "o dev sênior mais preguiçoso da sala", aplicando uma escada de decisão (reutilizar → stdlib → recursos nativos → dependências existentes → solução mínima) antes de escrever qualquer código novo. Resulta em ~54% menos código gerado, mantendo segurança e validação.
+
+#### 🔍 Comparativo: andrej-karpathy-skills vs. caveman vs. ponytail
+
+Os três são plugins/skills comportamentais para agentes de IA (Claude Code, Cursor, etc.), mas cada um otimiza uma dimensão diferente do trabalho do agente.
+
+| Critério | [andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills) | [caveman](https://github.com/juliusbrussee/caveman) | [ponytail](https://github.com/dietrichgebert/ponytail) |
+| :--- | :--- | :--- | :--- |
+| **Foco principal** | Qualidade do raciocínio e do código (evitar suposições, escopo e complexidade indevidos) | Redução de tokens na **comunicação/prosa** do agente | Redução de **quantidade de código** gerado (minimalismo) |
+| **O que otimiza** | Correção e disciplina de implementação | Custo de API e velocidade de resposta em texto | Manutenibilidade e superfície de código (menos linhas p/ manter/revisar) |
+| **Melhor quando** | Você quer um agente mais criterioso, que pergunta antes de assumir e não "invade" código fora do escopo | Você roda muitas sessões/agentes e quer cortar custo de tokens em explicações e respostas longas | Você quer evitar reinvenção de rodas e código inchado, priorizando stdlib/deps existentes |
+| **Não resolve** | Não reduz tokens nem volume de código gerado | Não impede superengenharia nem código desnecessário | Não trata verbosidade de texto/explicações |
+| **Sobreposição** | Complementa bem os outros dois (raciocínio + eficiência) | Pode ser combinado com ponytail (tokens de texto + tokens de código) | Pode ser combinado com caveman (código enxuto + prosa enxuta) |
+| **Quando usar juntos** | Base recomendada para qualquer projeto | Projetos com custo de API alto ou sessões muito longas | Projetos legados/grandes onde cada linha nova tem custo de manutenção |
+
+**Recomendação prática:** os três não são mutuamente exclusivos — `andrej-karpathy-skills` melhora *como* o agente pensa, `ponytail` reduz *quanto código* ele escreve, e `caveman` reduz *quantos tokens* ele gasta explicando o que fez. Usá-los em conjunto costuma trazer o melhor resultado: raciocínio disciplinado + código mínimo + comunicação enxuta.
