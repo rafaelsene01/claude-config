@@ -44,6 +44,9 @@ Habilidades e pacotes de instruções projetados para calibrar e aprimorar o com
 * ### [PleasePrompto/notebooklm-skill](https://github.com/PleasePrompto/notebooklm-skill)
   * **Descrição:** Skill focada em emular a metodologia do NotebookLM da Google. Orienta o modelo de IA a atuar como um especialista em síntese, curadoria e análise profunda de documentos, organizando fontes e gerando resumos estruturados de alto valor factual.
 
+* ### [Find Skills](https://agenticskills.io/skills/find-skills)
+  * **Descrição:** Skill para descoberta e instalação de outras agent skills. Ajuda o modelo a responder perguntas do tipo "como faço X" ou "existe uma skill para X", buscando e instalando a habilidade correspondente.
+
 ---
 
 ## 🛠️ Outros (Segurança, Sandbox, Roteamento & Otimizações)
