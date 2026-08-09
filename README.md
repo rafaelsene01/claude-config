@@ -64,7 +64,59 @@ Habilidades e pacotes de instruções projetados para calibrar e aprimorar o com
   * **Descrição:** Framework open-source para orquestração de múltiplos agentes de IA (*swarm intelligence* e *agentic workflows*). Permite criar fluxos de trabalho colaborativos e distribuídos entre assistentes de IA.
 
 * ### [affaan-m/ECC](https://github.com/affaan-m/ECC)
-  * **Descrição:** Framework open-source (MIT) que dá a agentes de codificação um sistema de engenharia coordenado em vez de depender de prompts repetidos. Implementa o ciclo `plan -> test -> implement -> review -> verify -> remember -> improve` com portões determinísticos de qualidade, e inclui 67 agentes especializados, 284 skills reutilizáveis (TDD, pesquisa, segurança, docs, frontend/backend, ML, ops), hooks/memória para aprendizado contínuo e o scanner de segurança AgentShield. Nativo para Claude Code, com adaptadores para Codex, Cursor, OpenCode, Gemini, Zed e GitHub Copilot.
+  * **Descrição:** Framework open-source (MIT) que dá a agentes de codificação um sistema de engenharia coordenado, com o ciclo `plan -> test -> implement -> review -> verify -> remember -> improve`, 67 agentes especializados, 284 skills reutilizáveis, hooks/memória para aprendizado contínuo e o scanner de segurança AgentShield. Nativo para Claude Code, com adaptadores para Codex, Cursor, OpenCode, Gemini, Zed e GitHub Copilot.
+  * **Comando `/ecc:xxx`:** o prefixo vem do `name: "ecc"` em `.claude-plugin/plugin.json` — basta criar `commands/<nome>.md` com `description:` no frontmatter para o comando surgir automaticamente, sem registro manual.
+  * **Skills:** instale por perfil (`--profile minimal|core|full`), por nome (`--skills tdd-workflow,security-review`) ou peça sugestão (`npx ecc-universal consult "<necessidade>"`).
+  * **Comando ≠ skill — o comando fixa quais skills carregar, a skill fica genérica:** o `.md` do comando não faz o trabalho pesado, mas também não delega a decisão de "quais skills usar" — essa lista fica fixa nele, para cada comando poder combinar um pacote diferente da mesma skill reutilizável. 
+  
+  Estrutura:
+
+    ```
+    .claude/
+    ├── commands/
+    │   └── ecc/
+    │       └── spec.md
+    └── skills/
+        ├── api-design/
+        ├── security-review/
+        └── backend-patterns/        (ou frontend-patterns/)
+    ```
+    
+  Exemplo mínimo, um `/ecc:spec` que gera `SPEC.md`:
+
+    ```
+    commands/ecc/spec.md
+    ---
+    description: Cria uma especificação técnica para uma feature
+    ---
+    Carregue e use estas skills antes de continuar:
+    - api-design
+    - backend-patterns / frontend-patterns
+    - security-review
+    - tdd-workflow
+
+    Depois, use a skill `spec` para produzir a especificação.
+
+    Pedido do usuário:
+    $ARGUMENTS
+    ```
+
+    ```
+    skills/spec/SKILL.md
+    ---
+    name: spec
+    description: Gera um SPEC.md para uma feature nova, sem escrever código
+    ---
+    1. Analise a arquitetura e os padrões já usados no projeto, cruzando com
+       o que as skills carregadas pelo comando trouxerem de contexto.
+    2. Produza SPEC.md: Contexto, Objetivo, Arquitetura, Alterações, APIs,
+       Dados, Segurança, Testes, Plano de implementação.
+
+    Regras: não implemente código, não modifique arquivos, não assuma
+    arquitetura que o projeto não tem.
+    ```
+
+    Uso: `/ecc:spec Autenticação OAuth com Google` — o texto após o comando chega como `$ARGUMENTS`; as skills carregadas vêm sempre do comando, não da skill `spec`.
 
 * ### [teamchong/pxpipe](https://github.com/teamchong/pxpipe)
   * **Descrição:** Ferramenta de otimização de context window (Image to Prompt). Converte grandes volumes de texto (system prompts, documentação de ferramentas e histórico antigo) em imagens PNG comprimidas. Como os modelos de visão cobram um valor fixo de tokens por imagem, reduz o custo total de tokens de entrada em 50% a 70%.
