@@ -81,7 +81,7 @@ Habilidades e pacotes de instruções projetados para calibrar e aprimorar o com
         ├── security-review/
         └── backend-patterns/        (ou frontend-patterns/)
     ```
-    
+
   Exemplo mínimo, um `/ecc:spec` que gera `SPEC.md`:
 
     ```
@@ -89,6 +89,15 @@ Habilidades e pacotes de instruções projetados para calibrar e aprimorar o com
     ---
     description: Cria uma especificação técnica para uma feature
     ---
+
+    # Technical Specification
+
+    Você está criando uma especificação técnica para a feature solicitada pelo usuário.
+
+    Feature solicitada:
+
+    $ARGUMENTS
+
     Carregue e use estas skills antes de continuar:
     - api-design
     - backend-patterns / frontend-patterns
@@ -99,22 +108,29 @@ Habilidades e pacotes de instruções projetados para calibrar e aprimorar o com
 
     Pedido do usuário:
     $ARGUMENTS
+
+    Considere obrigatoriamente:
+
+    1. Arquitetura existente
+    2. Padrões utilizados no projeto
+    3. APIs existentes
+    4. Modelos de dados
+    5. Segurança
+    6. Testes
+    7. Impacto em frontend e backend
+
+    ## Resultado
+
+    Crie uma especificação técnica contendo:
+
+    ### 1. Contexto
+
+    ### 2. Objetivo
+
+    ### 3. Arquitetura
     ```
 
-    ```
-    skills/spec/SKILL.md
-    ---
-    name: spec
-    description: Gera um SPEC.md para uma feature nova, sem escrever código
-    ---
-    1. Analise a arquitetura e os padrões já usados no projeto, cruzando com
-       o que as skills carregadas pelo comando trouxerem de contexto.
-    2. Produza SPEC.md: Contexto, Objetivo, Arquitetura, Alterações, APIs,
-       Dados, Segurança, Testes, Plano de implementação.
-
-    Regras: não implemente código, não modifique arquivos, não assuma
-    arquitetura que o projeto não tem.
-    ```
+    Obs: importante é usar o $ARGUMENTS e a parte de quais skills devem ser carregada, todo resto pode ser comportamento extra desse comando.
 
     Uso: `/ecc:spec Autenticação OAuth com Google` — o texto após o comando chega como `$ARGUMENTS`; as skills carregadas vêm sempre do comando, não da skill `spec`.
 
