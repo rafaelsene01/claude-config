@@ -21,6 +21,19 @@
       "Bash(pip install:*)"
     ]
   },
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node ~/.claude/hooks/ecc-rules-on-demand.js",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  },
   "mcpServers": {
     "context7": { "command": "npx", "args": ["-y", "@context7/mcp"] }
   },
