@@ -161,6 +161,15 @@ Habilidades e pacotes de instruções projetados para calibrar e aprimorar o com
 * ### [getagentseal/codeburn](https://github.com/getagentseal/codeburn)
   * **Descrição:** Ferramenta open-source, local e gratuita para rastrear gastos com tokens de IA e seus custos associados, mostrando onde o orçamento é consumido por modelo, projeto e tipo de tarefa. Monitora 36 ferramentas diferentes (Claude Code, Cursor, Codex, Gemini, Grok, etc.) a partir dos arquivos de sessão já presentes na máquina, com dashboard no terminal, painel web com gráficos e app de menu para macOS. Opera 100% offline — nenhum dado sai da máquina — e permite definir limites de gasto em sessões do Claude Code.
 
+* ### [thedotmack/claude-mem](https://github.com/thedotmack/claude-mem)
+  * **Descrição:** Sistema de memória persistente para o Claude Code que captura o contexto das sessões (decisões, arquivos alterados, aprendizados) em um banco de dados local e o injeta de volta automaticamente no início de sessões futuras, via hooks. Elimina a perda de contexto entre compactações e reinícios, permitindo que o agente "lembre" de trabalho anterior no mesmo projeto.
+
+* ### [obra/superpowers](https://github.com/obra/superpowers)
+  * **Descrição:** Framework de skills e metodologia de desenvolvimento de software para agentes de codificação (Claude Code, Cursor, GitHub Copilot CLI, Gemini CLI, Kimi Code, entre outros). Estrutura o trabalho do agente em etapas — brainstorming com perguntas de refinamento, planejamento em passos pequenos (2-5 min) com código completo, TDD no ciclo RED-GREEN-REFACTOR, desenvolvimento orientado por subagentes com revisão em duas etapas, e integração via git worktrees — evitando que o agente pule direto para o código sem design e testes.
+
+* ### [rebelytics/one-skill-to-rule-them-all](https://github.com/rebelytics/one-skill-to-rule-them-all)
+  * **Descrição:** Meta-skill open-source que observa as sessões de trabalho do agente para identificar padrões repetitivos e propor a criação ou melhoria de outras skills — inclusive de si mesma. Detecta correções, preferências e lacunas nas skills existentes, gerando logs estruturados de observações que o usuário revisa antes de aplicar as mudanças. Compatível com Claude Code, Claude Cowork, claude.ai e outras plataformas (relatos de integração com Hermes e Openclaw).
+
 #### 🔍 Comparativo: andrej-karpathy-skills vs. caveman vs. ponytail
 
 Os três são plugins/skills comportamentais para agentes de IA (Claude Code, Cursor, etc.), mas cada um otimiza uma dimensão diferente do trabalho do agente.
