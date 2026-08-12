@@ -8,7 +8,7 @@ Servidores que implementam o protocolo MCP para expandir as capacidades de assis
   * **Descrição:** Servidor MCP oficial da plataforma *21st.dev* (substituto do antigo Magic MCP). Permite buscar em um catálogo de mais de 10.000 componentes React e Tailwind, gerar novas UIs com IA e integrar diretamente no editor de código.
 
 * ### [Jpisnice/shadcn-ui-mcp-server](https://github.com/Jpisnice/shadcn-ui-mcp-server)
-  * **Descrição:** Servidor MCP dedicado ao ecossistema `shadcn/ui`. Permite que a IA busque componentes, visualize documentação/código e instale componentes `shadcn/ui` diretamente no projeto.
+  * **Descrição:** Servidor MCP dedicado ao ecossistema `shadcn/ui`. Permite que a IA busque código-fonte, demos e blocos de componentes, com suporte multi-framework (React com Radix UI ou Base UI, Svelte, Vue, React Native) e instalação direta no projeto.
 
 * ### [ChromeDevTools/chrome-devtools-mcp](https://github.com/ChromeDevTools/chrome-devtools-mcp)
   * **Descrição:** Servidor MCP oficial desenvolvido pela equipe do Chrome DevTools. Permite que assistentes de IA se conectem ao navegador para inspecionar o DOM, analisar a rede, auditar acessibilidade e depurar a aplicação em tempo real.
@@ -33,6 +33,9 @@ Habilidades e pacotes de instruções projetados para calibrar e aprimorar o com
 * ### [emilkowalski/skills](https://github.com/emilkowalski/skills)
   * **Descrição:** Criada por Emil Kowalski (especialista em UI/animação e criador do Sonner). Foca em micro-interações, animações fluídas (Framer Motion / CSS), acessibilidade e detalhes de acabamento de altíssimo nível.
 
+* ### [emilkowalski/skills (apple-design)](https://github.com/emilkowalski/skills/blob/main/skills/apple-design/SKILL.md)
+  * **Descrição:** Skill do mesmo repositório focada em traduzir a filosofia de design de interface da Apple (baseada em talks da WWDC como "Designing Fluid Interfaces") para desenvolvimento web. Ensina a construir UIs orientadas a gestos que respondem no toque (não na soltura), mantêm rastreamento 1:1 do dedo/ponteiro, permitem interrupção e reversão de animações a qualquer instante, usam springs em vez de keyframes fixos, fazem *handoff* de velocidade do gesto para a animação e projetam momentum/trajetória para pontos de encaixe — além de materiais translúcidos, tipografia adaptativa e acessibilidade (`prefers-reduced-motion`).
+
 * ### [vercel-labs/agent-skills (web-design-guidelines)](https://github.com/vercel-labs/agent-skills/tree/main/skills/web-design-guidelines)
   * **Descrição:** Skill mantida pela Vercel Labs com diretrizes de Web Design para IAs. Foca na construção de interfaces modernas em React/Next.js, hierarquia visual, espaçamento e padronização.
 
@@ -46,6 +49,12 @@ Habilidades e pacotes de instruções projetados para calibrar e aprimorar o com
 
 * ### [Find Skills](https://agenticskills.io/skills/find-skills)
   * **Descrição:** Skill para descoberta e instalação de outras agent skills. Ajuda o modelo a responder perguntas do tipo "como faço X" ou "existe uma skill para X", buscando e instalando a habilidade correspondente.
+
+* ### [tenfoldmarc/llm-council-skill](https://github.com/tenfoldmarc/llm-council-skill)
+  * **Descrição:** Skill para Claude Code que contorna a tendência do modelo de concordar com o enquadramento da pergunta, paralelizando 5 agentes com perfis opostos (Contrarian, First Principles Thinker, Expansionist, Outsider, Executor) sobre uma questão neutralizada, seguido de revisão cruzada anônima e síntese final com consensos, divergências e recomendação. Gera relatório HTML e transcrição em markdown. Triggers: `council this`, `pressure-test this`, `stress-test this`, `war room this`, `debate this`.
+
+* ### [mattpocock/skills](https://github.com/mattpocock/skills)
+  * **Descrição:** Coleção de agent skills de Matt Pocock focada em fundamentos de engenharia de software para desenvolvimento assistido por IA. Grupo *Engineering*: `/grill-with-docs` (entrevista para construir modelo de domínio compartilhado), `/tdd` (ciclo red-green-refactor), `/to-spec` (converte conversa em especificação), `/improve-codebase-architecture` (identifica refatorações), `/code-review` (avalia padrões e aderência à spec), `/diagnosing-bugs` (diagnóstico disciplinado). Grupo *Productivity*: `/grill-me` (entrevista sobre planos/designs), `/handoff` (compacta conversa para outro agente), `/teach` (ensina conceitos em múltiplas sessões), `/wait-what` (reapresenta mensagens com contexto faltando).
 
 ---
 
@@ -169,6 +178,9 @@ Habilidades e pacotes de instruções projetados para calibrar e aprimorar o com
 
 * ### [rebelytics/one-skill-to-rule-them-all](https://github.com/rebelytics/one-skill-to-rule-them-all)
   * **Descrição:** Meta-skill open-source que observa as sessões de trabalho do agente para identificar padrões repetitivos e propor a criação ou melhoria de outras skills — inclusive de si mesma. Detecta correções, preferências e lacunas nas skills existentes, gerando logs estruturados de observações que o usuário revisa antes de aplicar as mudanças. Compatível com Claude Code, Claude Cowork, claude.ai e outras plataformas (relatos de integração com Hermes e Openclaw).
+
+* ### [microsoft/markitdown](https://github.com/microsoft/markitdown)
+  * **Descrição:** Utilitário open-source da Microsoft para converter arquivos diversos (PDF, Office, imagens, áudio, HTML, CSV, EPUB, ZIP, entre outros) em Markdown, formato mais fácil de consumir por LLMs e pipelines de indexação/RAG. Disponível como biblioteca Python e CLI, com suporte a plugins e a um servidor MCP (`markitdown-mcp`) para uso direto por agentes de IA.
 
 #### 🔍 Comparativo: andrej-karpathy-skills vs. caveman vs. ponytail
 
