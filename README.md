@@ -24,7 +24,7 @@ Habilidades e pacotes de instruções projetados para calibrar e aprimorar o com
 
 ### 🖌️ Skills de Frontend, UI & UX Design
 
-* ### [leonxlnx/taste-skill](https://github.com/leonxlnx/taste-skill)
+* ### [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill)
   * **Descrição:** Skill focada em "bom gosto visual" e estética de UI. Fornece aos agentes orientações sobre refinamento visual, escolha de cores, alinhamentos e tom de design elegante para evitar UIs genéricas.
 
 * ### [pbakaus/impeccable](https://github.com/pbakaus/impeccable)
@@ -166,6 +166,11 @@ Habilidades e pacotes de instruções projetados para calibrar e aprimorar o com
 
 * ### [obra/superpowers](https://github.com/obra/superpowers)
   * **Descrição:** Framework de skills e metodologia de desenvolvimento de software para agentes de codificação (Claude Code, Cursor, GitHub Copilot CLI, Gemini CLI, Kimi Code, entre outros). Estrutura o trabalho do agente em etapas — brainstorming com perguntas de refinamento, planejamento em passos pequenos (2-5 min) com código completo, TDD no ciclo RED-GREEN-REFACTOR, desenvolvimento orientado por subagentes com revisão em duas etapas, e integração via git worktrees — evitando que o agente pule direto para o código sem design e testes.
+
+* ### [tech-leads-club/agent-skills](https://github.com/tech-leads-club/agent-skills)
+  * **Descrição:** Registro curado e validado de skills da comunidade Tech Leads Club (licença MIT no engine), com verificação de segurança antes da publicação — análise estática, hash de conteúdo, lockfile imutável e varredura com Snyk Agent Scan. Instalação via CLI interativa (`npx @tech-leads-club/agent-skills`) ou direta (`agent-skills install -s <skill> -a claude-code cursor`), com escopo global ou local e opção de cópia ou symlink. Catálogo cobre cloud (`aws-advisor`), automação (`playwright-skill`), design-to-code (`figma`) e segurança (`security-best-practices`).
+  * **`tlc-spec-driven` (spec-driven development):** planejamento e implementação de features em 4 fases adaptativas — *Specify → Design → Tasks → Execute* —, com requisitos testáveis em notação EARS, tarefas atômicas, commits atômicos no padrão Conventional Commits e rastreabilidade requisito → tarefa → commit. Os gates estruturais são impostos por scripts Python determinísticos (`validate_spec.py`, `validate_tasks.py`, `validate_state.py`, `check_commit.py`), não pela memória do modelo. Inclui Verificador independente (autor ≠ verificador, regra *evidence-or-zero*), log de decisões (`STATE.md`), matriz de cobertura de testes e camada de lições que evolui a própria skill entre sessões. É agnóstica de stack e de ferramenta.
+  * **`spec-driven-eval` (avaliação da implementação):** pontua o quanto uma implementação cumpre o PRD, critério de aceite por critério de aceite, gerando uma nota final comparável. Separa dois veredictos que falham de forma independente: o *framework* (respeitou o PRD e extraiu os requisitos implícitos — eixos `Final`, Escopo `S` e Elicitação `E`) e o *harness* de testes (prova que todo requisito sancionado foi construído — eixos `T` e Engineering Gates `G`). A pontuação é binária por checagem atômica (MET/UNMET) com evidência em `file:line`, o que torna a nota reprodutível entre avaliadores; crédito parcial é derivado da fração de checagens atendidas, nunca arbitrado em escala. Requer invocação explícita (`disable-model-invocation: true`) e serve para benchmarking de frameworks SDD sobre o mesmo PRD.
 
 * ### [rebelytics/one-skill-to-rule-them-all](https://github.com/rebelytics/one-skill-to-rule-them-all)
   * **Descrição:** Meta-skill open-source que observa as sessões de trabalho do agente para identificar padrões repetitivos e propor a criação ou melhoria de outras skills — inclusive de si mesma. Detecta correções, preferências e lacunas nas skills existentes, gerando logs estruturados de observações que o usuário revisa antes de aplicar as mudanças. Compatível com Claude Code, Claude Cowork, claude.ai e outras plataformas (relatos de integração com Hermes e Openclaw).
