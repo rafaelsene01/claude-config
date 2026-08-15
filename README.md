@@ -75,6 +75,9 @@ Habilidades e pacotes de instruções projetados para calibrar e aprimorar o com
 * ### [ruvnet/ruflo](https://github.com/ruvnet/ruflo)
   * **Descrição:** Framework open-source para orquestração de múltiplos agentes de IA (*swarm intelligence* e *agentic workflows*). Permite criar fluxos de trabalho colaborativos e distribuídos entre assistentes de IA.
 
+* ### [headroomlabs-ai/headroom](https://github.com/headroomlabs-ai/headroom)
+  * **Descrição:** Camada de compressão de contexto para agentes de IA. Funciona como biblioteca, proxy, servidor MCP ou middleware, comprimindo tudo que o agente lê (saídas de ferramentas, logs, chunks de RAG, arquivos, histórico de conversas) antes de chegar ao LLM — economia de 20-95% de tokens dependendo do conteúdo, mantendo a precisão das respostas.
+
 * ### [affaan-m/ECC](https://github.com/affaan-m/ECC)
   * **Descrição:** Framework open-source (MIT) que dá a agentes de codificação um sistema de engenharia coordenado, com o ciclo `plan -> test -> implement -> review -> verify -> remember -> improve`, 67 agentes especializados, 284 skills reutilizáveis, hooks/memória para aprendizado contínuo e o scanner de segurança AgentShield. Nativo para Claude Code, com adaptadores para Codex, Cursor, OpenCode, Gemini, Zed e GitHub Copilot.
   * **Comando `/ecc:xxx`:** o prefixo vem do `name: "ecc"` em `.claude-plugin/plugin.json` — basta criar `commands/<nome>.md` com `description:` no frontmatter para o comando surgir automaticamente, sem registro manual.
