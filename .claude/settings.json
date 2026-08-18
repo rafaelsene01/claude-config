@@ -18,7 +18,16 @@
       "Bash(npm install:*)",
       "Bash(pnpm add:*)",
       "Bash(yarn add:*)",
-      "Bash(pip install:*)"
+      "Bash(pip install:*)",
+      "Read(~/.ssh/**)",
+      "Read(~/.aws/**)",
+      "Read(**/.env*)",
+      "Write(~/.ssh/**)",
+      "Write(~/.aws/**)",
+      "Bash(curl * | bash)",
+      "Bash(ssh *)",
+      "Bash(scp *)",
+      "Bash(nc *)"
     ]
   },
   "hooks": {
