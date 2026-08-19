@@ -66,6 +66,9 @@ Habilidades e pacotes de instruções projetados para calibrar e aprimorar o com
 * ### [akitaonrails/ai-jail](https://github.com/akitaonrails/ai-jail)
   * **Descrição:** Desenvolvido por Fabio Akita, é um wrapper de segurança/sandbox multi-OS (usando `bubblewrap` no Linux e `sandbox-exec` no macOS). Restringe o acesso do Claude Code e outros agentes de IA apenas às pastas do projeto, isolando arquivos sensíveis como `~/.ssh` e `.env`.
 
+* ### [usestrix/strix](https://github.com/usestrix/strix)
+  * **Descrição:** Plataforma open-source (Apache 2.0) de pentest autônomo com agentes de IA. Executa a aplicação de verdade, encontra vulnerabilidades (OWASP Top 10: injeção, XSS, SSRF, bypass de autenticação, falhas de lógica de negócio) e valida cada achado com PoC funcional, reduzindo falso-positivo. Tem orquestração multi-agente (recon, exploração, pós-exploração), CLI, dashboard local (`strix view`), integração CI/CD via GitHub Action em PRs e skills `SKILL.md` para Claude Code/Cursor. Instala com `curl -sSL https://strix.ai/install | bash`; requer Docker e chave de API de LLM.
+
 * ### [diegosouzapw/OmniRoute](https://github.com/diegosouzapw/OmniRoute)
   * **Descrição:** Roteador inteligente de requisições LLM. Permite gerenciar múltiplos provedores e modelos de IA (OpenAI, Anthropic, Gemini, Ollama, etc.), aplicando estratégias de fallback, balanceamento de carga, monitoramento de custos e controle de latência.
 
