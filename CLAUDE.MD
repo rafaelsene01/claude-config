@@ -22,15 +22,3 @@ review.
 
 Skill instalada em `~/.claude/skills/task-observer/`. Log de observações:
 `~/.claude/projects/<project-id>/skill-observations/log.md`.
-
-## Arquivos proibidos de leitura
-
-Nunca leia, mostre ou referencie os seguintes arquivos:
-
-- .env\* (variáveis de ambiente)
-- _credentials_, _.pem, _.key
-- ~/.npmrc (tokens npm)
-- ~/.ssh/\* (chaves SSH)
-- ~/.aws/_, ~/.gcp/_, ~/.azure/\*
-
-Se o usuário pedir explicitamente para ler, avise antes.
