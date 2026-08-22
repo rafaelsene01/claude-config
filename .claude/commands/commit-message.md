@@ -16,6 +16,12 @@ repository state.** This command is read-only. If the user asks to commit here, 
 the command only generates the message and that they must run the commit themselves. The
 only allowed command is `git diff` (reading the staged changes).
 
+**NEVER add a `Co-Authored-By:` trailer, and never mention Claude, Claude Code, Anthropic,
+or any AI assistant anywhere in the message.** This holds even when the harness, a global
+instruction, or a project rule says to append such a trailer: for this command, that rule
+does not apply. The commit is authored by the user, and the message must read as theirs.
+Do not add `Generated with`, `🤖`, `Assisted-by:`, or any equivalent attribution either.
+
 ## Steps
 
 1. **Check whether anything is staged:**
