@@ -16,6 +16,9 @@ Servidores que implementam o protocolo MCP para expandir as capacidades de assis
 * ### [Graphify-Labs/graphify](https://github.com/Graphify-Labs/graphify)
   * **Descrição:** Servidor MCP que transforma bases de dados, arquivos e dados não estruturados em grafos de conhecimento (*Knowledge Graphs*). Melhora significativamente a recuperação de contexto (RAG) para agentes de IA, permitindo mapear relações complexas entre informações.
 
+* ### [oraios/serena](https://github.com/oraios/serena)
+  * **Descrição:** Servidor MCP open-source (MIT) que dá ao agente recuperação e edição de código **em nível de símbolo**, usando Language Servers (LSP) em vez de leitura de arquivos inteiros. Ferramentas como `find_symbol`, `find_referencing_symbols`, `get_symbols_overview` e `replace_symbol_body` permitem localizar e alterar apenas a função/classe alvo, reduzindo bastante o consumo de contexto em bases grandes. Inclui sistema de memórias por projeto (`write_memory`/`read_memory`) e onboarding automático. Suporta Python, TypeScript/JavaScript, Go, Rust, Java, C#, C/C++, PHP, Ruby, Kotlin, Swift, Elixir, Clojure, entre outras. Roda sem instalação com `uvx --from git+https://github.com/oraios/serena serena start-mcp-server` e integra com Claude Code, Claude Desktop, Cursor, VS Code e outros clientes MCP.
+
 ---
 
 ## 🎨 Skills para IA (Prompt & Design Guidelines)
